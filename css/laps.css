@@ -1,0 +1,111 @@
+/* ============================================================
+   ACTIVE SESSION LAP TRAY & ALARM TOAST ALERT
+   ============================================================ */
+
+/* Lap Times Tray */
+.laps-tray {
+  width: 100%;
+  max-width: 540px;
+  background: rgba(17, 18, 21, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 16px 20px;
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.laps-tray.has-laps {
+  display: flex;
+}
+
+.laps-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 10px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.laps-list {
+  max-height: 160px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lap-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  background: rgba(23, 24, 28, 0.7);
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* Alarm Toast Alert */
+.alarm-toast {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a1c22;
+  border: 2px solid var(--accent-green);
+  border-radius: 20px;
+  padding: 16px 24px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9), 0 0 20px rgba(34, 197, 94, 0.3);
+  z-index: 200;
+  animation: slideDownToast 0.3s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+}
+
+@keyframes slideDownToast {
+  from { transform: translate(-50%, -40px); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+.alarm-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.alarm-bell {
+  color: var(--accent-green);
+  animation: ringBell 1s infinite ease-in-out;
+}
+
+@keyframes ringBell {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(15deg); }
+  75% { transform: rotate(-15deg); }
+}
+
+.alarm-content h4 {
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: 1px;
+}
+
+.alarm-content p {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.alarm-dismiss-btn {
+  background: var(--accent-green);
+  color: #000000;
+  border: none;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 800;
+  padding: 8px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+}

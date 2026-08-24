@@ -1,0 +1,72 @@
+:root {
+  --bg-pure: #000000;
+  --card-top: #18191c;
+  --card-bottom: #121315;
+  --card-crease: #070708;
+  --digit-color: #f1f3f7;
+  --text-muted: #555a66;
+  --card-radius: 20px;
+  --card-shadow: 0 30px 60px -15px rgba(0, 0, 0, 1), 0 0 0 1px rgba(255, 255, 255, 0.04);
+  --accent-green: #22c55e;
+  --accent-red: #ef4444;
+  --accent-blue: #3b82f6;
+  --accent-amber: #f59e0b;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg-pure);
+  color: var(--digit-color);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-x: hidden;
+  padding: 24px;
+  position: relative;
+}
+
+.rain-bg-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 40%, #0d0f14 0%, #040507 70%, #000000 100%);
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+
+.rain-bg-backdrop.disabled {
+  opacity: 0;
+}
+
+.rain-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.fliqlo-container {
+  width: 100%;
+  max-width: 1100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  position: relative;
+  z-index: 10;
+}

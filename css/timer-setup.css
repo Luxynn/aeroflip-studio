@@ -1,0 +1,176 @@
+/* ============================================================
+   TIMER SETUP PANEL & SPINNERS
+   ============================================================ */
+
+.timer-setup-screen {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  animation: fadeIn 0.25s ease forwards;
+}
+
+.setup-card {
+  width: 100%;
+  max-width: 580px;
+  background: rgba(17, 18, 21, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 28px;
+  padding: 36px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 26px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+}
+
+.setup-header {
+  text-align: center;
+}
+
+.setup-header h3 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #ffffff;
+  margin-bottom: 6px;
+}
+
+.setup-header p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.timer-input-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.time-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.time-spinner label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+}
+
+.spinner-control {
+  display: flex;
+  align-items: center;
+  background: #18191f;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.spin-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.35rem;
+  font-weight: 700;
+  width: 38px;
+  height: 48px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.spin-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.spinner-control input {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-family: 'Space Grotesk', monospace;
+  font-size: 1.8rem;
+  font-weight: 800;
+  width: 60px;
+  text-align: center;
+  outline: none;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.spinner-control input::-webkit-outer-spin-button,
+.spinner-control input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+
+.spinner-colon {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  margin-top: 24px;
+}
+
+.timer-presets {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.preset-pill {
+  background: #18191f;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.preset-pill:hover {
+  background: #242730;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+.preset-pill.reset-preset:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--accent-red);
+  border-color: var(--accent-red);
+}
+
+.setup-start-btn {
+  background: #ffffff;
+  color: #000000;
+  border: none;
+  font-family: inherit;
+  font-size: 1.15rem;
+  font-weight: 800;
+  padding: 16px 44px;
+  border-radius: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 10px 25px rgba(255, 255, 255, 0.18);
+  transition: all 0.2s ease;
+  margin-top: 6px;
+}
+
+.setup-start-btn:hover {
+  background: #e2e2e2;
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(255, 255, 255, 0.25);
+}

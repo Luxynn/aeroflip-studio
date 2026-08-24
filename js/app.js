@@ -1411,9 +1411,6 @@ class FlipStopwatchApp {
   }
 
   setupEventListeners() {
-    // Rain Toggle Button
-    this.rainToggleBtn.addEventListener('click', () => this.toggleRain());
-
     // Screen Wake Lock Button
     if (this.wakeLockBtn) {
       this.wakeLockBtn.addEventListener('click', () => this.toggleWakeLock());

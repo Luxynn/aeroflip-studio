@@ -4,6 +4,7 @@ class FliqloCardManager {
     this.onFlip = onFlipCallback;
     this.cardTimeouts = new Map();
     this.cardNodes = new Map();
+    this.cardValues = new Map(); // In-memory cache to avoid DOM dataset read/writes on every tick
 
     this.cacheSubElements();
   }
@@ -17,16 +18,18 @@ class FliqloCardManager {
           flipTop: card.querySelector('.flip-card-top .digit'),
           flipBottom: card.querySelector('.flip-card-bottom .digit'),
         });
+        const initialVal = card.getAttribute('data-value') || '00';
+        this.cardValues.set(card, initialVal);
       }
     });
   }
 
   flipCard(cardElement, nextVal) {
     if (!cardElement) return;
-    const currentVal = cardElement.dataset.targetValue || cardElement.getAttribute('data-value') || '00';
+    const currentVal = this.cardValues.get(cardElement) || '00';
     if (currentVal === nextVal) return;
 
-    cardElement.dataset.targetValue = nextVal;
+    this.cardValues.set(cardElement, nextVal);
 
     if (this.cardTimeouts.has(cardElement)) {
       clearTimeout(this.cardTimeouts.get(cardElement));
@@ -41,8 +44,11 @@ class FliqloCardManager {
     nodes.flipBottom.textContent = nextVal;
 
     cardElement.classList.remove('flipping');
-    void cardElement.offsetWidth;
-    cardElement.classList.add('flipping');
+    
+    // Use requestAnimationFrame instead of forced offsetWidth reflow
+    requestAnimationFrame(() => {
+      cardElement.classList.add('flipping');
+    });
 
     if (this.onFlip) {
       this.onFlip(cardElement);
@@ -51,7 +57,6 @@ class FliqloCardManager {
     const timeout = setTimeout(() => {
       nodes.lower.textContent = nextVal;
       cardElement.classList.remove('flipping');
-      cardElement.setAttribute('data-value', nextVal);
       this.cardTimeouts.delete(cardElement);
     }, 700);
 
@@ -70,8 +75,8 @@ class FliqloCardManager {
       nodes.upper.textContent = val;
       nodes.lower.textContent = val;
     }
+    this.cardValues.set(cardElement, val);
     cardElement.setAttribute('data-value', val);
-    cardElement.dataset.targetValue = val;
   }
 
   updateDisplay(hStr, mStr, sStr) {

@@ -6,7 +6,7 @@
   --digit-color: #f1f3f7;
   --text-muted: #555a66;
   --card-radius: 20px;
-  --card-shadow: 0 30px 60px -15px rgba(0, 0, 0, 1), 0 0 0 1px rgba(255, 255, 255, 0.04);
+  --card-shadow: 0 16px 36px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.04);
   --accent-green: #22c55e;
   --accent-red: #ef4444;
   --accent-blue: #3b82f6;
@@ -44,20 +44,24 @@ body {
   pointer-events: none;
   background: radial-gradient(circle at 50% 40%, #0d0f14 0%, #040507 70%, #000000 100%);
   opacity: 1;
-  transition: opacity 0.5s ease;
+  transition: opacity 0.4s ease;
 }
 
 .rain-bg-backdrop.disabled {
   opacity: 0;
+  visibility: hidden;
 }
 
 .rain-canvas {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   z-index: 1;
+  pointer-events: none;
+  will-change: transform;
+  transform: translateZ(0); /* Hardware accelerated composite layer */
 }
 
 .fliqlo-container {
@@ -106,6 +110,5 @@ body.zen-mode .laps-tray {
 .fliqlo-controls-bar,
 .task-goal-bar,
 .laps-tray {
-  transition: all 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
-

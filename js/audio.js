@@ -2,6 +2,7 @@ class AudioManager {
   constructor() {
     this.audioCtx = null;
     this.soundEnabled = true;
+    this.cachedNoiseBuffer = null;
     this.initAudioContext();
   }
 
@@ -10,9 +11,24 @@ class AudioManager {
       const AudioContext = window.AudioContext || window.webkitAudioContext;
       if (AudioContext) {
         this.audioCtx = new AudioContext();
+        this.initNoiseBuffer();
       }
     } catch (e) {
       console.warn('Web Audio API not supported', e);
+    }
+  }
+
+  initNoiseBuffer() {
+    if (!this.audioCtx) return;
+    try {
+      const bufferSize = Math.floor(this.audioCtx.sampleRate * 0.05);
+      this.cachedNoiseBuffer = this.audioCtx.createBuffer(1, bufferSize, this.audioCtx.sampleRate);
+      const output = this.cachedNoiseBuffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        output[i] = Math.random() * 2 - 1;
+      }
+    } catch (e) {
+      console.warn('Failed to pre-allocate audio noise buffer', e);
     }
   }
 
@@ -43,33 +59,28 @@ class AudioManager {
     osc.start(now);
     osc.stop(now + 0.05);
 
-    const landingTime = now + 0.34;
-    const bufferSize = Math.floor(this.audioCtx.sampleRate * 0.05);
-    const noiseBuffer = this.audioCtx.createBuffer(1, bufferSize, this.audioCtx.sampleRate);
-    const output = noiseBuffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) {
-      output[i] = Math.random() * 2 - 1;
+    if (this.cachedNoiseBuffer) {
+      const landingTime = now + 0.34;
+      const whiteNoise = this.audioCtx.createBufferSource();
+      whiteNoise.buffer = this.cachedNoiseBuffer;
+
+      const filter = this.audioCtx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(950, landingTime);
+      filter.Q.setValueAtTime(2.2, landingTime);
+
+      const noiseGain = this.audioCtx.createGain();
+      noiseGain.gain.setValueAtTime(0, now);
+      noiseGain.gain.setValueAtTime(0.22, landingTime);
+      noiseGain.gain.exponentialRampToValueAtTime(0.001, landingTime + 0.05);
+
+      whiteNoise.connect(filter);
+      filter.connect(noiseGain);
+      noiseGain.connect(this.audioCtx.destination);
+
+      whiteNoise.start(landingTime);
+      whiteNoise.stop(landingTime + 0.055);
     }
-
-    const whiteNoise = this.audioCtx.createBufferSource();
-    whiteNoise.buffer = noiseBuffer;
-
-    const filter = this.audioCtx.createBiquadFilter();
-    filter.type = 'bandpass';
-    filter.frequency.setValueAtTime(950, landingTime);
-    filter.Q.setValueAtTime(2.2, landingTime);
-
-    const noiseGain = this.audioCtx.createGain();
-    noiseGain.gain.setValueAtTime(0, now);
-    noiseGain.gain.setValueAtTime(0.22, landingTime);
-    noiseGain.gain.exponentialRampToValueAtTime(0.001, landingTime + 0.05);
-
-    whiteNoise.connect(filter);
-    filter.connect(noiseGain);
-    noiseGain.connect(this.audioCtx.destination);
-
-    whiteNoise.start(landingTime);
-    whiteNoise.stop(landingTime + 0.055);
   }
 
   playAlarmChime() {

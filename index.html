@@ -16,27 +16,36 @@
   </div>
 
   <div class="fliqlo-container">
-    <!-- Top Mode Switcher (Kronometre / Geri Sayım) -->
+    <!-- Top Mode Switcher (Saat / Kronometre / Geri Sayım) -->
     <header class="fliqlo-header-nav">
       <div class="mode-switch-wrap">
-        <button class="mode-pill active" id="modeStopwatchBtn" data-mode="stopwatch">
+        <button class="mode-pill" id="modeClockBtn" data-mode="clock" data-tooltip="Canlı Saat Modu" data-tooltip-sub="Sistem saatini Fliqlo mekanik kartlarıyla canlı gösterir [C veya 1]">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline><path d="M12 2v2"></path></svg>
+          <span>Saat</span>
+        </button>
+        <button class="mode-pill active" id="modeStopwatchBtn" data-mode="stopwatch" data-tooltip="Kronometre Modu" data-tooltip-sub="Hassas ileri sayım ve tur kaydı yapar [W veya 2]">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
           <span>Kronometre</span>
         </button>
-        <button class="mode-pill" id="modeTimerBtn" data-mode="timer">
+        <button class="mode-pill" id="modeTimerBtn" data-mode="timer" data-tooltip="Geri Sayım Modu" data-tooltip-sub="Belirlenen süreden geriye sayar ve alarm çalar [T veya 3]">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 22h14"></path><path d="M5 2h14"></path><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"></path><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"></path></svg>
           <span>Geri Sayım</span>
         </button>
       </div>
 
       <div class="header-aux-actions">
-        <!-- Rain & Lightning Effect Toggle -->
-        <button id="rainToggleBtn" class="icon-only-btn active-accent" title="Yağmur & Yıldırım Efekti (Y)">
+        <!-- Screen Wake Lock Toggle -->
+        <button id="wakeLockBtn" class="icon-only-btn" data-tooltip="Ekranı Uyanık Tut" data-tooltip-sub="Sayaç veya saat açıkken ekranın kararmasını / uykuya geçmesini engeller [K]">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path><circle cx="12" cy="12" r="4"></circle></svg>
+        </button>
+
+        <!-- Ambience & Background Mode Toggle (Rain, Fireplace, Stars, Pure Dark) -->
+        <button id="ambienceToggleBtn" class="icon-only-btn active-accent" data-tooltip="Atmosfer & Ambiyans" data-tooltip-sub="Yağmur, Şömine, Kozmik Gece ve Mat Siyah arasında geçiş yapar [Y]">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"></path><path d="M8 19v2"></path><path d="M8 13v2"></path><path d="M16 19v2"></path><path d="M16 13v2"></path><path d="M12 21v2"></path><path d="M12 15v2"></path></svg>
         </button>
 
         <!-- History & Compare Modal Toggle -->
-        <button id="historyModalBtn" class="icon-only-btn" title="Kayıtlar & Kıyaslama (H)">
+        <button id="historyModalBtn" class="icon-only-btn" data-tooltip="Kayıtlar & Kıyaslama" data-tooltip-sub="Kayıtlı oturumları ve tur analizlerini görüntüler [H]">
           <div class="btn-badge-wrap">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
             <span class="session-count-badge" id="sessionCountBadge">0</span>
@@ -44,13 +53,18 @@
         </button>
 
         <!-- Sound Toggle -->
-        <button id="soundToggleBtn" class="icon-only-btn" title="Mekanik Ses (S)">
+        <button id="soundToggleBtn" class="icon-only-btn" data-tooltip="Mekanik Kart Sesi" data-tooltip-sub="Fliqlo kart çevirme klik ses efektini açar / kapatır [S]">
           <svg class="sound-on" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
           <svg class="sound-off hidden" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
         </button>
 
+        <!-- Settings Modal Toggle -->
+        <button id="settingsModalBtn" class="icon-only-btn" data-tooltip="Ayarlar" data-tooltip-sub="Kısayollar, dil, veri yedekleme ve sistem tercihleri [O]">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </button>
+
         <!-- Fullscreen -->
-        <button id="fullscreenBtn" class="icon-only-btn" title="Tam Ekran (F)">
+        <button id="fullscreenBtn" class="icon-only-btn" data-tooltip="Tam Ekran Modu" data-tooltip-sub="Masa saati görünümü için tam ekrana geçer [F]">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
         </button>
       </div>
@@ -115,6 +129,13 @@
 
     <!-- Flipping Clock Stage (Giant Fliqlo Cards) -->
     <main class="fliqlo-stage" id="fliqloStage">
+      <!-- Focus Goal / Task Bar -->
+      <div class="task-goal-bar" id="taskGoalBar">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+        <input type="text" id="taskGoalInput" class="task-goal-input" placeholder="Odaklanma hedefi / Görev yazın... (Örn: Matematik Soru Çözümü)" maxlength="45">
+        <button class="task-clear-btn hidden" id="taskClearBtn" title="Hedefi Temizle">&times;</button>
+      </div>
+
       <div class="fliqlo-board">
         <!-- HOURS -->
         <div class="fliqlo-block">
@@ -159,44 +180,64 @@
         </div>
       </div>
 
-      <!-- MS Indicator -->
-      <div class="ms-pill">
-        <span class="ms-label">MS</span>
+      <!-- Clock Mode Meta / Date Banner (Visible in Clock mode) -->
+      <div class="clock-info-banner hidden" id="clockInfoBanner">
+        <span class="clock-date-text" id="clockDateText">24 Ağustos 2026, Pazartesi</span>
+      </div>
+
+      <!-- MS Indicator / AM-PM Indicator -->
+      <div class="ms-pill" id="msPill">
+        <span class="ms-label" id="msLabel">MS</span>
         <span class="ms-val" id="msDisplay">.00</span>
       </div>
     </main>
 
     <!-- Floating Minimal Controls -->
     <nav class="fliqlo-controls-bar" id="fliqloControlsBar">
-      <!-- Reset -->
-      <button id="resetBtn" class="action-btn secondary" title="Sıfırla (R)" disabled>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
-        <span>Sıfırla</span>
-      </button>
+      <!-- Stopwatch / Timer Controls Group -->
+      <div class="timer-controls-group" id="timerControlsGroup">
+        <!-- Reset -->
+        <button id="resetBtn" class="action-btn secondary" title="Sıfırla (R)" disabled>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+          <span>Sıfırla</span>
+        </button>
 
-      <!-- Start / Pause -->
-      <button id="startPauseBtn" class="action-btn primary" title="Başlat / Duraklat (Boşluk Tuşu)">
-        <svg class="icon-play" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <polygon points="5 3 19 12 5 21 5 3"></polygon>
-        </svg>
-        <svg class="icon-pause hidden" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <rect x="6" y="4" width="4" height="16" rx="1"></rect>
-          <rect x="14" y="4" width="4" height="16" rx="1"></rect>
-        </svg>
-        <span id="startPauseText">Başlat</span>
-      </button>
+        <!-- Start / Pause -->
+        <button id="startPauseBtn" class="action-btn primary" title="Başlat / Duraklat (Boşluk Tuşu)">
+          <svg class="icon-play" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          <svg class="icon-pause hidden" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <rect x="6" y="4" width="4" height="16" rx="1"></rect>
+            <rect x="14" y="4" width="4" height="16" rx="1"></rect>
+          </svg>
+          <span id="startPauseText">Başlat</span>
+        </button>
 
-      <!-- Lap (Tur / Ara Kayıt) -->
-      <button id="lapBtn" class="action-btn secondary" title="Tur / Ara Kayıt (L)" disabled>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
-        <span id="lapBtnText">Tur</span>
-      </button>
+        <!-- Lap (Tur / Ara Kayıt) -->
+        <button id="lapBtn" class="action-btn secondary" title="Tur / Ara Kayıt (L)" disabled>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
+          <span id="lapBtnText">Tur</span>
+        </button>
 
-      <!-- Save Session Button -->
-      <button id="saveSessionBtn" class="action-btn save-btn" title="Oturumu Kaydet" disabled>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-        <span>Kaydet</span>
-      </button>
+        <!-- Save Session Button -->
+        <button id="saveSessionBtn" class="action-btn save-btn" title="Oturumu Kaydet" disabled>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+          <span>Kaydet</span>
+        </button>
+      </div>
+
+      <!-- Clock Mode Controls Group -->
+      <div class="clock-controls-group hidden" id="clockControlsGroup">
+        <button id="toggle1224Btn" class="action-btn secondary" title="12s / 24s Saat Formatını Değiştir">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          <span id="clockFormatText">24 Saat Formatı</span>
+        </button>
+        <div class="clock-live-indicator">
+          <span class="live-pulse-dot"></span>
+          <span>CANLI SAAT</span>
+        </div>
+      </div>
     </nav>
 
     <!-- Active Session Current Lap List -->
@@ -301,6 +342,148 @@
       </div>
     </div>
   </div>
+
+  <!-- Settings Modal Dialog -->
+  <div class="modal-backdrop hidden" id="settingsModalBackdrop">
+    <div class="fliqlo-modal settings-modal">
+      <div class="modal-header">
+        <div class="modal-tabs">
+          <button class="modal-tab active" id="tabSettingsShortcuts">⌨️ Klavye Kısayolları</button>
+          <button class="modal-tab" id="tabSettingsGeneral">🌍 Dil & Tercihler</button>
+          <button class="modal-tab" id="tabSettingsData">💾 Veri & Yedekleme</button>
+        </div>
+        <button class="modal-close-btn" id="closeSettingsModalBtn">&times;</button>
+      </div>
+
+      <div class="modal-body settings-body">
+        <!-- Tab 1: Keyboard Shortcuts Rebinding -->
+        <div class="tab-view active" id="viewSettingsShortcuts">
+          <div class="settings-section-header">
+            <h4>Özelleştirilebilir Kısayol Tuşları</h4>
+            <p>Değiştirmek istediğiniz tuşa tıklayıp klavyenizden yeni bir tuşa basın.</p>
+          </div>
+
+          <div class="shortcuts-grid" id="shortcutsListGrid"></div>
+
+          <div class="shortcuts-footer-actions">
+            <button class="modal-btn secondary-action" id="resetShortcutsBtn">Varsayılan Kısayollara Dön</button>
+          </div>
+
+          <!-- Creator & Signature Info Card -->
+          <div class="creator-signature-card">
+            <div class="signature-icon">⚡</div>
+            <div class="signature-info">
+              <span class="signature-title">FLIQLO Focus Station</span>
+              <span class="signature-author">Tasarım & Geliştirme: <strong>HP</strong></span>
+            </div>
+            <span class="signature-badge">v2.0 PRO</span>
+          </div>
+        </div>
+
+        <!-- Tab 2: General & Language -->
+        <div class="tab-view" id="viewSettingsGeneral">
+          <div class="settings-section-header">
+            <h4>Dil & Arayüz Tercihleri</h4>
+            <p>Uygulama genel görünüm ve varsayılan davranış ayarları.</p>
+          </div>
+
+          <div class="settings-group">
+            <label class="settings-label">Uygulama Dili</label>
+            <div class="language-options-group">
+              <button class="lang-option-btn active" id="langTrBtn" data-lang="tr">
+                <span class="lang-flag">🇹🇷</span>
+                <span class="lang-name">Türkçe</span>
+                <span class="lang-check">✓</span>
+              </button>
+              <button class="lang-option-btn" id="langEnBtn" data-lang="en">
+                <span class="lang-flag">🇬🇧</span>
+                <span class="lang-name">English</span>
+                <span class="lang-check">✓</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <label class="settings-label">Açılış Varsayılan Modu</label>
+            <select class="settings-select" id="defaultModeSelect">
+              <option value="stopwatch">Kronometre (Stopwatch)</option>
+              <option value="clock">Canlı Saat (Clock)</option>
+              <option value="timer">Geri Sayım (Timer)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Tab 3: Data & Backup -->
+        <div class="tab-view" id="viewSettingsData">
+          <div class="settings-section-header">
+            <h4>Kayıtlı Veriler & Yedekleme</h4>
+            <p>Oturum ve tur verilerinizi cihazınıza aktarın veya yedekten geri yükleyin.</p>
+          </div>
+
+          <div class="data-actions-grid">
+            <div class="data-card">
+              <div class="data-card-info">
+                <h5>JSON Formatında Yedekle</h5>
+                <p>Tüm oturum ve tur geçmişinizi JSON dosyası olarak indirin.</p>
+              </div>
+              <button class="data-action-btn" id="exportJsonBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <span>JSON İndir</span>
+              </button>
+            </div>
+
+            <div class="data-card">
+              <div class="data-card-info">
+                <h5>CSV Tablo Dışa Aktarımı</h5>
+                <p>Excel ve tablolarda açmak için turları CSV formatında dışa aktarın.</p>
+              </div>
+              <button class="data-action-btn" id="exportCsvBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <span>CSV İndir</span>
+              </button>
+            </div>
+
+            <div class="data-card">
+              <div class="data-card-info">
+                <h5>Yedekten İçe Aktar (Import)</h5>
+                <p>Daha önce aldığınız bir JSON yedeğini yükleyerek geçmişinizi geri getirin.</p>
+              </div>
+              <button class="data-action-btn secondary" id="importBackupBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                <span>Yedek Yükle</span>
+              </button>
+            </div>
+
+            <div class="data-card danger">
+              <div class="data-card-info">
+                <h5>Tüm Oturum Geçmişini Sıfırla</h5>
+                <p>Kayıtlı tüm kronometre ve geri sayım oturumlarını kalıcı olarak siler.</p>
+              </div>
+              <button class="data-action-btn danger" id="clearAllDataBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                <span>Tümünü Sil</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Global Floating Interactive Tooltip -->
+  <div class="app-floating-tooltip" id="appTooltip">
+    <div class="tooltip-title" id="tooltipTitle"></div>
+    <div class="tooltip-sub" id="tooltipSub"></div>
+  </div>
+
+  <!-- Realtime Quick Toast Notification -->
+  <div class="quick-toast-banner" id="quickToast">
+    <span class="toast-icon" id="toastIcon">☀️</span>
+    <span class="toast-text" id="toastText"></span>
+  </div>
+
+  <!-- Hidden File Input for JSON Backup Restore -->
+  <input type="file" id="importFileInput" accept=".json" style="display: none;">
 
   <!-- Modular Zero-Server Scripts -->
   <script src="js/utils.js"></script>

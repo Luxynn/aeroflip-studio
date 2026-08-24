@@ -70,3 +70,42 @@ body {
   position: relative;
   z-index: 10;
 }
+
+/* ============================================================
+   ZEN / MINIMALIST FOCUS MODE
+   ============================================================ */
+body.zen-mode {
+  cursor: none;
+}
+
+body.zen-mode .fliqlo-header-nav {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-16px);
+}
+
+body.zen-mode .fliqlo-controls-bar {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(16px);
+}
+
+body.zen-mode .task-goal-bar {
+  opacity: 0.3;
+  border-color: transparent;
+  background: transparent;
+}
+
+body.zen-mode .laps-tray {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+}
+
+.fliqlo-header-nav,
+.fliqlo-controls-bar,
+.task-goal-bar,
+.laps-tray {
+  transition: all 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+

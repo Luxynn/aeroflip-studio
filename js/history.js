@@ -5,8 +5,13 @@ class HistoryManager {
     this.analytics = analytics;
     this.ui = ui;
 
-    this.historyFilter = 'stopwatch';
-    this.selectedSessionIds = new Set();
+    this.historyFilter = localStorage.getItem('aeroflip_history_filter') || 'stopwatch';
+    this.activeTab = localStorage.getItem('aeroflip_history_tab') || 'list';
+    try {
+      this.selectedSessionIds = new Set(JSON.parse(localStorage.getItem('aeroflip_selected_sessions') || '[]'));
+    } catch (e) {
+      this.selectedSessionIds = new Set();
+    }
 
     this.bindDomElements();
     this.init();
@@ -216,9 +221,8 @@ class HistoryManager {
 
   openHistoryModal() {
     this.historyModalBackdrop.classList.remove('hidden');
-    this.selectedSessionIds.clear();
     this.setHistoryFilter(this.historyFilter);
-    this.switchTab('list');
+    this.switchTab(this.activeTab);
   }
 
   closeHistoryModal() {
@@ -231,7 +235,7 @@ class HistoryManager {
   setHistoryFilter(type) {
     if (this.analytics) this.analytics.hidePopover();
     this.historyFilter = type;
-    this.selectedSessionIds.clear();
+    localStorage.setItem('aeroflip_history_filter', type);
 
     if (type === 'stopwatch') {
       this.filterStopwatchBtn.classList.add('active');
@@ -246,6 +250,9 @@ class HistoryManager {
 
   switchTab(tab) {
     if (this.analytics) this.analytics.hidePopover();
+    this.activeTab = tab;
+    localStorage.setItem('aeroflip_history_tab', tab);
+
     if (tab === 'list') {
       this.tabSavedList.classList.add('active');
       this.tabCompare.classList.remove('active');
@@ -263,6 +270,7 @@ class HistoryManager {
   deleteSession(id) {
     this.storage.deleteSession(id);
     this.selectedSessionIds.delete(id);
+    this.saveSelection();
     this.updateSessionBadge();
     this.renderSavedList();
   }
@@ -273,6 +281,7 @@ class HistoryManager {
     } else {
       this.selectedSessionIds.add(id);
     }
+    this.saveSelection();
     this.renderSavedList();
   }
 
@@ -288,7 +297,16 @@ class HistoryManager {
       filtered.forEach(s => this.selectedSessionIds.add(s.id));
     }
 
+    this.saveSelection();
     this.renderSavedList();
+  }
+
+  saveSelection() {
+    try {
+      localStorage.setItem('aeroflip_selected_sessions', JSON.stringify([...this.selectedSessionIds]));
+    } catch (e) {
+      console.warn('Failed to persist selection', e);
+    }
   }
 
   toggleLapExpand(id) {

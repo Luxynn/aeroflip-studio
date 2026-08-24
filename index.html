@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FLIQLO Kronometre & Geri Sayım (Timer)</title>
+  <title>AeroFlip Studio | Minimalist Flip Clock & Stopwatch</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
@@ -373,10 +374,10 @@
           <div class="creator-signature-card">
             <div class="signature-icon">⚡</div>
             <div class="signature-info">
-              <span class="signature-title">FLIQLO Focus Station</span>
-              <span class="signature-author">Tasarım & Geliştirme: <strong>HP</strong></span>
+              <span class="signature-title">AeroFlip Studio</span>
+              <span class="signature-author">Tasarım & Geliştirme: <a href="https://github.com/Luxynn" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; text-decoration: none; font-weight: 700;">Luxynn</a> (<a href="https://instagram.com/batuhnolgun" target="_blank" rel="noopener noreferrer" style="color: #94a3b8; text-decoration: none;">@batuhnolgun</a>)</span>
             </div>
-            <span class="signature-badge">v2.0 PRO</span>
+            <span class="signature-badge">v2.1 PRO</span>
           </div>
         </div>
 
@@ -423,12 +424,12 @@
           <div class="data-actions-grid">
             <div class="data-card">
               <div class="data-card-info">
-                <h5>JSON Formatında Yedekle</h5>
-                <p>Tüm oturum ve tur geçmişinizi JSON dosyası olarak indirin.</p>
+                <h5>Excel (.xlsx) Raporu</h5>
+                <p>Özet, Oturumlar ve Turlar olmak üzere 3 sayfalı profesyonel Excel tablosu oluşturun.</p>
               </div>
-              <button class="data-action-btn" id="exportJsonBtn">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                <span>JSON İndir</span>
+              <button class="data-action-btn primary-excel" id="exportExcelBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="8" y1="13" x2="16" y2="13"></line><line x1="8" y1="17" x2="16" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                <span>📊 Excel'e Aktar</span>
               </button>
             </div>
 
@@ -440,6 +441,17 @@
               <button class="data-action-btn" id="exportCsvBtn">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                 <span>CSV İndir</span>
+              </button>
+            </div>
+
+            <div class="data-card">
+              <div class="data-card-info">
+                <h5>JSON Formatında Yedekle</h5>
+                <p>Tüm oturum ve tur geçmişinizi JSON dosyası olarak indirin.</p>
+              </div>
+              <button class="data-action-btn secondary" id="exportJsonBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <span>JSON İndir</span>
               </button>
             </div>
 
@@ -484,6 +496,9 @@
 
   <!-- Hidden File Input for JSON Backup Restore -->
   <input type="file" id="importFileInput" accept=".json" style="display: none;">
+
+  <!-- External SheetJS (.xlsx Engine) -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <!-- Modular Zero-Server Scripts -->
   <script src="js/utils.js"></script>

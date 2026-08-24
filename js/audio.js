@@ -1,7 +1,7 @@
 class AudioManager {
   constructor() {
     this.audioCtx = null;
-    this.soundEnabled = true;
+    this.soundEnabled = localStorage.getItem('aeroflip_sound_enabled') !== 'false';
     this.cachedNoiseBuffer = null;
     this.initAudioContext();
   }

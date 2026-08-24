@@ -781,6 +781,18 @@
   transform: translateY(-1px);
 }
 
+.data-action-btn.primary-excel {
+  background: #10b981;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+}
+
+.data-action-btn.primary-excel:hover {
+  background: #059669;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
+}
+
 .data-action-btn.secondary {
   background: rgba(255, 255, 255, 0.08);
   color: #e2e8f0;

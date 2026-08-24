@@ -21,7 +21,7 @@ class UIManager {
 
     this.wakeLockBtn = document.getElementById('wakeLockBtn');
     this.wakeLock = null;
-    this.wakeLockEnabled = false;
+    this.wakeLockEnabled = localStorage.getItem('aeroflip_wakelock_enabled') === 'true';
 
     this.zenTimeout = null;
 
@@ -167,23 +167,50 @@ class UIManager {
       this.wakeLockBtn.addEventListener('click', () => this.toggleWakeLock());
     }
 
+    // Auto-restore Wake Lock on F5 / startup if previously enabled
+    if (this.wakeLockEnabled) {
+      if (this.wakeLockBtn) {
+        this.wakeLockBtn.classList.add('active-wake');
+        this.wakeLockBtn.title = 'Ekran Uyanık Tutuluyor (Aktif)';
+      }
+      this.requestWakeLock(true);
+
+      // Fallback: acquire on first user gesture if browser policy requires it on load
+      const onFirstInteraction = () => {
+        if (this.wakeLockEnabled && !this.wakeLock) {
+          this.requestWakeLock(true);
+        }
+        window.removeEventListener('pointerdown', onFirstInteraction);
+        window.removeEventListener('keydown', onFirstInteraction);
+      };
+      window.addEventListener('pointerdown', onFirstInteraction, { passive: true, once: true });
+      window.addEventListener('keydown', onFirstInteraction, { passive: true, once: true });
+    }
+
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible' && this.wakeLockEnabled) {
-        this.requestWakeLock();
+        this.requestWakeLock(true);
       }
     });
   }
 
-  async requestWakeLock() {
+  async requestWakeLock(silent = false) {
     if ('wakeLock' in navigator) {
       try {
         this.wakeLock = await navigator.wakeLock.request('screen');
         this.wakeLockEnabled = true;
+        try {
+          localStorage.setItem('aeroflip_wakelock_enabled', 'true');
+        } catch (e) {
+          console.warn('Failed to save wakelock state', e);
+        }
         if (this.wakeLockBtn) {
           this.wakeLockBtn.classList.add('active-wake');
           this.wakeLockBtn.title = 'Ekran Uyanık Tutuluyor (Aktif)';
         }
-        this.showToast('Ekran Uyanık Tutma Açık — Cihaz uyku moduna geçmeyecek', '☀️');
+        if (!silent) {
+          this.showToast('Ekran Uyanık Tutma Açık — Cihaz uyku moduna geçmeyecek', '☀️');
+        }
         this.wakeLock.addEventListener('release', () => {
           if (!this.wakeLockEnabled && this.wakeLockBtn) {
             this.wakeLockBtn.classList.remove('active-wake');
@@ -192,15 +219,24 @@ class UIManager {
         });
       } catch (err) {
         console.warn('Wake Lock error:', err);
-        this.showToast('Tarayıcınız Wake Lock iznini onaylamadı', '⚠️');
+        if (!silent) {
+          this.showToast('Tarayıcınız Wake Lock iznini onaylamadı', '⚠️');
+        }
       }
     } else {
-      this.showToast('Tarayıcınız Wake Lock API desteklemiyor', '⚠️');
+      if (!silent) {
+        this.showToast('Tarayıcınız Wake Lock API desteklemiyor', '⚠️');
+      }
     }
   }
 
   releaseWakeLock() {
     this.wakeLockEnabled = false;
+    try {
+      localStorage.setItem('aeroflip_wakelock_enabled', 'false');
+    } catch (e) {
+      console.warn('Failed to save wakelock state', e);
+    }
     if (this.wakeLock) {
       this.wakeLock.release();
       this.wakeLock = null;
@@ -216,7 +252,7 @@ class UIManager {
     if (this.wakeLockEnabled) {
       this.releaseWakeLock();
     } else {
-      this.requestWakeLock();
+      this.requestWakeLock(false);
     }
   }
 }

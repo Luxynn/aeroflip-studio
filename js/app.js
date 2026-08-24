@@ -144,12 +144,20 @@ class FlipStopwatchApp {
   init() {
     this.setupEventListeners();
     this.updateClockFormatBtnUI();
+    this.updateSoundBtnUI();
+    this.updateAmbienceUI();
+
+    // Restore saved timer custom preset
+    const savedH = localStorage.getItem('aeroflip_timer_h');
+    const savedM = localStorage.getItem('aeroflip_timer_m');
+    const savedS = localStorage.getItem('aeroflip_timer_s');
+    if (savedH !== null && this.timerInputHours) this.timerInputHours.value = savedH;
+    if (savedM !== null && this.timerInputMinutes) this.timerInputMinutes.value = savedM;
+    if (savedS !== null && this.timerInputSeconds) this.timerInputSeconds.value = savedS;
 
     // Default mode setup
     const defMode = localStorage.getItem('fliqlo_default_mode') || 'stopwatch';
-    if (defMode !== 'stopwatch') {
-      this.switchMode(defMode);
-    }
+    this.switchMode(defMode);
   }
 
   /* ============================================================
@@ -271,6 +279,9 @@ class FlipStopwatchApp {
       this.clockDateText.textContent = now.toLocaleDateString('tr-TR', options);
     }
 
+    // Update Browser Tab Title in Clock Mode
+    document.title = `🕒 ${hStr}:${mStr} | AeroFlip Studio`;
+
     // Update Pill
     if (this.clockFormat === '12h') {
       if (this.msLabel) this.msLabel.textContent = 'DÖNEM';
@@ -292,6 +303,14 @@ class FlipStopwatchApp {
     this.timerInputHours.value = String(h).padStart(2, '0');
     this.timerInputMinutes.value = String(m).padStart(2, '0');
     this.timerInputSeconds.value = String(s).padStart(2, '0');
+
+    try {
+      localStorage.setItem('aeroflip_timer_h', this.timerInputHours.value);
+      localStorage.setItem('aeroflip_timer_m', this.timerInputMinutes.value);
+      localStorage.setItem('aeroflip_timer_s', this.timerInputSeconds.value);
+    } catch (e) {
+      console.warn('Failed to save timer inputs', e);
+    }
 
     const totalMs = (h * 3600 + m * 60 + s) * 1000;
     this.timerDurationMs = totalMs;
@@ -414,6 +433,13 @@ class FlipStopwatchApp {
         this.msDisplay.textContent = msStr;
       }
       this.lastMsDomUpdate = now;
+
+      // Update Live Browser Tab Title
+      if (this.mode === 'stopwatch') {
+        document.title = `⏱️ ${hStr}:${mStr}:${sStr} | AeroFlip Studio`;
+      } else if (this.mode === 'timer') {
+        document.title = `⏳ ${hStr}:${mStr}:${sStr} | AeroFlip Studio`;
+      }
     }
   }
 
@@ -422,6 +448,7 @@ class FlipStopwatchApp {
     cancelAnimationFrame(this.timerId);
     if (this.worker) this.worker.postMessage('stop');
     this.timerRemainingMs = 0;
+    document.title = '🔔 SÜRE DOLDU! | AeroFlip Studio';
 
     this.startPauseBtn.classList.remove('is-running');
     this.startPauseBtn.querySelector('.icon-play').classList.remove('hidden');
@@ -517,6 +544,7 @@ class FlipStopwatchApp {
     this.resetBtn.disabled = true;
     this.lapBtn.disabled = true;
     this.saveSessionBtn.disabled = true;
+    document.title = 'AeroFlip Studio | Minimalist Flip Clock & Stopwatch';
 
     this.renderActiveLaps();
 
@@ -623,30 +651,51 @@ class FlipStopwatchApp {
       none: { name: 'Mat Siyah (Minimalist Zen)', icon: '🌑' }
     };
     const info = modeMeta[newMode] || { name: newMode, icon: '🌤️' };
-    if (newMode === 'none') {
-      this.rainBackdrop.classList.add('disabled');
+    this.updateAmbienceUI();
+    if (this.ui) this.ui.showToast(`Atmosfer: ${info.name}`, info.icon);
+  }
+
+  updateAmbienceUI() {
+    if (!this.rain) return;
+    if (this.rain.currentMode === 'none') {
+      if (this.rainBackdrop) this.rainBackdrop.classList.add('disabled');
       if (this.ambienceToggleBtn) this.ambienceToggleBtn.classList.remove('active-accent');
     } else {
-      this.rainBackdrop.classList.remove('disabled');
+      if (this.rainBackdrop) this.rainBackdrop.classList.remove('disabled');
       if (this.ambienceToggleBtn) this.ambienceToggleBtn.classList.add('active-accent');
     }
-    if (this.ui) this.ui.showToast(`Atmosfer: ${info.name}`, info.icon);
   }
 
   toggleSound() {
     this.audio.soundEnabled = !this.audio.soundEnabled;
-    const soundOnIcon = this.soundToggleBtn.querySelector('.sound-on');
-    const soundOffIcon = this.soundToggleBtn.querySelector('.sound-off');
+    try {
+      localStorage.setItem('aeroflip_sound_enabled', String(this.audio.soundEnabled));
+    } catch (e) {
+      console.warn('Failed to persist sound state', e);
+    }
+    this.updateSoundBtnUI();
 
     if (this.audio.soundEnabled) {
-      soundOnIcon.classList.remove('hidden');
-      soundOffIcon.classList.add('hidden');
       this.audio.playMechanicalClick();
       if (this.ui) this.ui.showToast('Mekanik Kart Sesi Açık', '🔊');
     } else {
-      soundOnIcon.classList.add('hidden');
-      soundOffIcon.classList.remove('hidden');
       if (this.ui) this.ui.showToast('Mekanik Kart Sesi Sessize Alındı', '🔇');
+    }
+  }
+
+  updateSoundBtnUI() {
+    if (!this.soundToggleBtn) return;
+    const soundOnIcon = this.soundToggleBtn.querySelector('.sound-on');
+    const soundOffIcon = this.soundToggleBtn.querySelector('.sound-off');
+
+    if (soundOnIcon && soundOffIcon) {
+      if (this.audio.soundEnabled) {
+        soundOnIcon.classList.remove('hidden');
+        soundOffIcon.classList.add('hidden');
+      } else {
+        soundOnIcon.classList.add('hidden');
+        soundOffIcon.classList.remove('hidden');
+      }
     }
   }
 

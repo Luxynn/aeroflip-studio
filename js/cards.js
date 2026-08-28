@@ -43,12 +43,12 @@ class FliqloCardManager {
     nodes.flipTop.textContent = currentVal;
     nodes.flipBottom.textContent = nextVal;
 
+    const isAlreadyFlipping = cardElement.classList.contains('flipping');
     cardElement.classList.remove('flipping');
-    
-    // Use requestAnimationFrame instead of forced offsetWidth reflow
-    requestAnimationFrame(() => {
-      cardElement.classList.add('flipping');
-    });
+    if (isAlreadyFlipping) {
+      void cardElement.offsetWidth;
+    }
+    cardElement.classList.add('flipping');
 
     if (this.onFlip) {
       this.onFlip(cardElement);

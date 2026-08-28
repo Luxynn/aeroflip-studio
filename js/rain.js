@@ -121,11 +121,13 @@ class AtmosphereEngine {
 
     if (mode === 'none') {
       this.stop();
+      if (this.canvas) this.canvas.style.display = 'none';
       if (this.ctx) {
         this.ctx.fillStyle = '#000000';
         this.ctx.fillRect(0, 0, this.width, this.height);
       }
     } else {
+      if (this.canvas) this.canvas.style.display = 'block';
       this.initParticles();
       this.start();
     }

@@ -18,6 +18,7 @@ class FlipStopwatchApp {
     this.lastLapTime = 0;
     this.lastMsDomUpdate = 0;
     this.lastTimerFrameTime = 0;
+    this.lastTitleSec = -1;
 
     // Clock Mode State
     this.clockInterval = null;
@@ -68,7 +69,7 @@ class FlipStopwatchApp {
             if (!intervalId) {
               intervalId = setInterval(function() {
                 self.postMessage('tick');
-              }, 25);
+              }, 500);
             }
           } else if (e.data === 'stop') {
             if (intervalId) {
@@ -429,12 +430,15 @@ class FlipStopwatchApp {
 
     const now = performance.now();
     if (now - this.lastMsDomUpdate >= MS_DOM_THROTTLE_INTERVAL_MS || msValue === 0) {
-      if (this.msDisplay) {
+      if (this.msDisplay && this.msDisplay.textContent !== msStr) {
         this.msDisplay.textContent = msStr;
       }
       this.lastMsDomUpdate = now;
+    }
 
-      // Update Live Browser Tab Title
+    // Update Live Browser Tab Title only when whole second changes (1/s instead of 30/s)
+    if (totalSeconds !== this.lastTitleSec) {
+      this.lastTitleSec = totalSeconds;
       if (this.mode === 'stopwatch') {
         document.title = `⏱️ ${hStr}:${mStr}:${sStr} | AeroFlip Studio`;
       } else if (this.mode === 'timer') {
@@ -484,7 +488,7 @@ class FlipStopwatchApp {
     this.startTime = performance.now();
     this.lastTimerFrameTime = this.startTime;
     this.timerId = requestAnimationFrame((t) => this.update(t));
-    if (this.worker) this.worker.postMessage('start');
+    if (document.hidden && this.worker) this.worker.postMessage('start');
 
     this.startPauseBtn.classList.add('is-running');
     this.startPauseBtn.querySelector('.icon-play').classList.add('hidden');
@@ -544,6 +548,7 @@ class FlipStopwatchApp {
     this.resetBtn.disabled = true;
     this.lapBtn.disabled = true;
     this.saveSessionBtn.disabled = true;
+    this.lastTitleSec = -1;
     document.title = 'AeroFlip Studio | Minimalist Flip Clock & Stopwatch';
 
     this.renderActiveLaps();
@@ -771,6 +776,23 @@ class FlipStopwatchApp {
     }
     this.soundToggleBtn.addEventListener('click', () => this.toggleSound());
     this.fullscreenBtn.addEventListener('click', () => this.toggleFullscreen());
+
+    // Auto-manage Web Worker vs requestAnimationFrame on background tab switch
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        if (this.isRunning && this.worker) {
+          this.worker.postMessage('start');
+        }
+      } else {
+        if (this.worker) {
+          this.worker.postMessage('stop');
+        }
+        if (this.isRunning && !this.timerId) {
+          this.lastTimerFrameTime = performance.now();
+          this.timerId = requestAnimationFrame((t) => this.update(t));
+        }
+      }
+    });
   }
 }
 

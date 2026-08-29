@@ -9,12 +9,36 @@
 }
 
 .compare-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
   gap: 14px;
+  padding: 4px 2px 14px 2px;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.compare-grid::-webkit-scrollbar {
+  height: 8px;
+}
+
+.compare-grid::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 999px;
+}
+
+.compare-grid::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+}
+
+.compare-grid::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.32);
 }
 
 .compare-card {
+  flex: 0 0 260px;
+  min-width: 260px;
   background: #17191e;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 18px;
@@ -22,6 +46,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  box-sizing: border-box;
 }
 
 .compare-card.winner {
@@ -92,12 +117,34 @@
   background: #17191e;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 18px;
-  overflow: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+}
+
+.lap-compare-table-wrap::-webkit-scrollbar {
+  height: 8px;
+}
+
+.lap-compare-table-wrap::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 999px;
+}
+
+.lap-compare-table-wrap::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+}
+
+.lap-compare-table-wrap::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.32);
 }
 
 .lap-compare-table {
   width: 100%;
-  border-collapse: collapse;
+  min-width: max-content;
+  border-collapse: separate;
+  border-spacing: 0;
   text-align: left;
   font-size: 0.85rem;
 }
@@ -109,6 +156,7 @@
   color: var(--text-muted);
   letter-spacing: 0.5px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  white-space: nowrap;
 }
 
 .lap-compare-table td {
@@ -117,6 +165,22 @@
   font-family: 'Space Grotesk', monospace;
   position: relative;
   transition: background 0.18s ease;
+  white-space: nowrap;
+}
+
+/* Sticky first column for Tur No / Kayıt No */
+.lap-compare-table th:first-child,
+.lap-compare-table td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  background: #1d2027;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.35);
+}
+
+.lap-compare-table tr:hover td:first-child {
+  background: #232731;
 }
 
 .lap-compare-table tr:last-child td {

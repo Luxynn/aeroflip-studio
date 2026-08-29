@@ -321,6 +321,7 @@ class SettingsManager {
       'Mod / Tür',
       'Tarih',
       'Tur / Kayıt No',
+      'Tur Notu / Adı',
       'Tur Süresi (Split)',
       'Kümülatif Süre (Total)',
       'Tur Kalan Süre'
@@ -349,6 +350,7 @@ class SettingsManager {
             typeText,
             sessionDate,
             lapLabel,
+            lap.name || '-',
             splitMs !== null ? msToExcelTime(splitMs) : '-',
             totalMs !== null ? msToExcelTime(totalMs) : '-',
             remainingMs !== null ? msToExcelTime(remainingMs) : '-'
@@ -364,12 +366,13 @@ class SettingsManager {
       { wch: 16 }, // Mod / Tür
       { wch: 18 }, // Tarih
       { wch: 18 }, // Tur / Kayıt No
+      { wch: 24 }, // Tur Notu / Adı
       { wch: 20 }, // Tur Süresi (Split)
       { wch: 22 }, // Kümülatif Süre (Total)
       { wch: 18 }  // Tur Kalan Süre
     ];
     if (lapsRows.length > 1) {
-      wsLaps['!autofilter'] = { ref: `A1:H${lapsRows.length}` };
+      wsLaps['!autofilter'] = { ref: `A1:I${lapsRows.length}` };
     }
 
     /* ==========================================================
@@ -543,16 +546,31 @@ class SettingsManager {
     reader.readAsText(file);
   }
 
-  clearAllData() {
-    if (confirm('Tüm kayıtlı kronometre ve geri sayım oturumlarını silmek istediğinize emin misiniz? Bu işlem geri alınamaz.')) {
-      localStorage.removeItem('fliqlo_saved_sessions');
-      this.storage.sessions = [];
-      if (this.app.history) {
-        this.app.history.updateSessionBadge();
-        this.app.history.renderSavedList();
-      }
-      if (this.ui) this.ui.showToast('Tüm oturum kayıtları temizlendi', '🗑️');
+  async clearAllData() {
+    let confirmed = false;
+    if (this.ui && typeof this.ui.confirmDialog === 'function') {
+      confirmed = await this.ui.confirmDialog({
+        title: 'Tüm Geçmişi Sıfırla',
+        message: 'Kayıtlı TÜM kronometre ve geri sayım oturumları kalıcı olarak silinecektir. Bu işlem kesinlikle geri alınamaz!',
+        confirmText: 'Tümünü Temizle',
+        cancelText: 'Vazgeç',
+        icon: 'warning'
+      });
+    } else {
+      confirmed = window.confirm('Tüm kayıtlı kronometre ve geri sayım oturumlarını silmek istediğinize emin misiniz? Bu işlem geri alınamaz.');
     }
+
+    if (!confirmed) return;
+
+    localStorage.removeItem('fliqlo_saved_sessions');
+    this.storage.sessions = [];
+    if (this.app.history) {
+      this.app.history.selectedSessionIds.clear();
+      this.app.history.saveSelection();
+      this.app.history.updateSessionBadge();
+      this.app.history.renderSavedList();
+    }
+    if (this.ui) this.ui.showToast('Tüm oturum kayıtları temizlendi', '🗑️');
   }
 }
 

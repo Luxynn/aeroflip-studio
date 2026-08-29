@@ -255,6 +255,79 @@ class UIManager {
       this.requestWakeLock(false);
     }
   }
+
+  /* ============================================================
+     6. GLASSMORPHIC CONFIRMATION DIALOG PROMISE
+     ============================================================ */
+  confirmDialog({
+    title = 'Emin misiniz?',
+    message = 'Bu işlem geri alınamaz.',
+    confirmText = 'Evet, Sil',
+    cancelText = 'Vazgeç',
+    icon = 'trash'
+  } = {}) {
+    return new Promise((resolve) => {
+      const backdrop = document.getElementById('confirmModalBackdrop');
+      const titleEl = document.getElementById('confirmModalTitle');
+      const msgEl = document.getElementById('confirmModalMessage');
+      const confirmBtn = document.getElementById('confirmModalConfirmBtn');
+      const cancelBtn = document.getElementById('confirmModalCancelBtn');
+      const iconSvg = document.getElementById('confirmModalIconSvg');
+
+      if (!backdrop || !confirmBtn || !cancelBtn) {
+        resolve(window.confirm(message));
+        return;
+      }
+
+      if (titleEl) titleEl.textContent = title;
+      if (msgEl) msgEl.textContent = message;
+      if (confirmBtn) confirmBtn.textContent = confirmText;
+      if (cancelBtn) cancelBtn.textContent = cancelText;
+
+      if (iconSvg) {
+        if (icon === 'warning') {
+          iconSvg.innerHTML = `
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          `;
+        } else {
+          iconSvg.innerHTML = `
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            <line x1="10" y1="11" x2="10" y2="17"></line>
+            <line x1="14" y1="11" x2="14" y2="17"></line>
+          `;
+        }
+      }
+
+      backdrop.classList.remove('hidden');
+
+      const cleanup = (result) => {
+        backdrop.classList.add('hidden');
+        confirmBtn.removeEventListener('click', onConfirm);
+        cancelBtn.removeEventListener('click', onCancel);
+        document.removeEventListener('keydown', onKeyDown);
+        resolve(result);
+      };
+
+      const onConfirm = () => cleanup(true);
+      const onCancel = () => cleanup(false);
+      const onKeyDown = (e) => {
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          cleanup(false);
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          cleanup(true);
+        }
+      };
+
+      confirmBtn.addEventListener('click', onConfirm);
+      cancelBtn.addEventListener('click', onCancel);
+      document.addEventListener('keydown', onKeyDown);
+    });
+  }
 }
 
 window.UIManager = UIManager;

@@ -310,8 +310,18 @@ class ComparisonAnalytics {
       `;
     }
 
+    const countHint = selected.length > 3 
+      ? '<span style="font-size: 0.75rem; color: #60a5fa; font-weight: 600;">↔️ Kartları ve tabloyu yatay kaydırabilirsiniz</span>' 
+      : '';
+
     this.container.innerHTML = `
-      <div class="compare-grid">${cardsHtml}</div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+          <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted);">${selected.length} Kronometre Oturumu Kıyaslanıyor</span>
+          ${countHint}
+        </div>
+        <div class="compare-grid">${cardsHtml}</div>
+      </div>
       ${lapTableHtml}
     `;
   }
@@ -435,8 +445,18 @@ class ComparisonAnalytics {
       `;
     }
 
+    const countHint = selected.length > 3 
+      ? '<span style="font-size: 0.75rem; color: #60a5fa; font-weight: 600;">↔️ Kartları ve tabloyu yatay kaydırabilirsiniz</span>' 
+      : '';
+
     this.container.innerHTML = `
-      <div class="compare-grid">${cardsHtml}</div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+          <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted);">${selected.length} Geri Sayım Oturumu Kıyaslanıyor</span>
+          ${countHint}
+        </div>
+        <div class="compare-grid">${cardsHtml}</div>
+      </div>
       ${checkpointTableHtml}
     `;
   }

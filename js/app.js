@@ -103,6 +103,7 @@ class FlipStopwatchApp {
     this.modeTimerBtn = document.getElementById('modeTimerBtn');
     this.timerSetupPanel = document.getElementById('timerSetupPanel');
     this.fliqloStage = document.getElementById('fliqloStage');
+    this.taskGoalBar = document.getElementById('taskGoalBar');
     this.fliqloControlsBar = document.getElementById('fliqloControlsBar');
     this.timerControlsGroup = document.getElementById('timerControlsGroup');
     this.clockControlsGroup = document.getElementById('clockControlsGroup');
@@ -187,6 +188,7 @@ class FlipStopwatchApp {
       if (this.timerControlsGroup) this.timerControlsGroup.classList.add('hidden');
       if (this.clockControlsGroup) this.clockControlsGroup.classList.remove('hidden');
       if (this.clockInfoBanner) this.clockInfoBanner.classList.remove('hidden');
+      if (this.taskGoalBar) this.taskGoalBar.classList.add('hidden');
       this.lapsContainer.classList.remove('has-laps');
 
       this.startClock();
@@ -198,6 +200,7 @@ class FlipStopwatchApp {
       if (this.timerControlsGroup) this.timerControlsGroup.classList.remove('hidden');
       if (this.clockControlsGroup) this.clockControlsGroup.classList.add('hidden');
       if (this.clockInfoBanner) this.clockInfoBanner.classList.add('hidden');
+      if (this.taskGoalBar) this.taskGoalBar.classList.remove('hidden');
       if (this.msLabel) this.msLabel.textContent = 'MS';
       if (this.msDisplay) this.msDisplay.textContent = '.00';
       this.lapBtnText.textContent = 'Tur';
@@ -212,8 +215,9 @@ class FlipStopwatchApp {
       if (this.timerControlsGroup) this.timerControlsGroup.classList.remove('hidden');
       if (this.clockControlsGroup) this.clockControlsGroup.classList.add('hidden');
       if (this.clockInfoBanner) this.clockInfoBanner.classList.add('hidden');
-      if (this.msLabel) this.msLabel.textContent = 'MS';
-      if (this.msDisplay) this.msDisplay.textContent = '.00';
+      if (this.taskGoalBar) this.taskGoalBar.classList.remove('hidden');
+      if (this.msLabel) this.msLabel.textContent = 'GEÇEN';
+      if (this.msDisplay) this.msDisplay.textContent = '00:00:00';
       this.lapBtnText.textContent = 'Ara Kayıt';
       this.lapsHeaderSplit.textContent = 'FARK';
       this.lapsHeaderTotal.textContent = 'KALAN SÜRE';
@@ -319,7 +323,8 @@ class FlipStopwatchApp {
     this.timerInitialSetSec = h * 3600 + m * 60 + s;
 
     this.cards.setAllInstant(String(h).padStart(2, '0'), String(m).padStart(2, '0'), String(s).padStart(2, '0'));
-    this.msDisplay.textContent = '.00';
+    if (this.msLabel) this.msLabel.textContent = 'GEÇEN';
+    if (this.msDisplay) this.msDisplay.textContent = '00:00:00';
   }
 
   adjustTimerInput(type, delta) {
@@ -415,8 +420,6 @@ class FlipStopwatchApp {
 
   updateDisplay(msValue) {
     const totalSeconds = Math.floor(msValue / 1000);
-    const ms = Math.floor((msValue % 1000) / 10);
-
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
@@ -424,14 +427,35 @@ class FlipStopwatchApp {
     const hStr = String(hours).padStart(2, '0');
     const mStr = String(minutes).padStart(2, '0');
     const sStr = String(seconds).padStart(2, '0');
-    const msStr = '.' + String(ms).padStart(2, '0');
 
     this.cards.updateDisplay(hStr, mStr, sStr);
 
     const now = performance.now();
     if (now - this.lastMsDomUpdate >= MS_DOM_THROTTLE_INTERVAL_MS || msValue === 0) {
-      if (this.msDisplay && this.msDisplay.textContent !== msStr) {
-        this.msDisplay.textContent = msStr;
+      if (this.mode === 'timer') {
+        const elapsed = Math.max(0, this.timerDurationMs - msValue);
+        const elapsedHMS = FliqloUtils.formatTimeHMS(elapsed);
+        let timerPillText = elapsedHMS;
+        if (this.laps && this.laps.length > 0) {
+          const splitSinceLap = Math.max(0, elapsed - this.lastLapTime);
+          const splitHMS = FliqloUtils.formatTimeHMS(splitSinceLap);
+          timerPillText = `${elapsedHMS} (Tur: +${splitHMS})`;
+        }
+        if (this.msLabel && this.msLabel.textContent !== 'GEÇEN') {
+          this.msLabel.textContent = 'GEÇEN';
+        }
+        if (this.msDisplay && this.msDisplay.textContent !== timerPillText) {
+          this.msDisplay.textContent = timerPillText;
+        }
+      } else if (this.mode === 'stopwatch') {
+        const ms = Math.floor((msValue % 1000) / 10);
+        const msStr = '.' + String(ms).padStart(2, '0');
+        if (this.msLabel && this.msLabel.textContent !== 'MS') {
+          this.msLabel.textContent = 'MS';
+        }
+        if (this.msDisplay && this.msDisplay.textContent !== msStr) {
+          this.msDisplay.textContent = msStr;
+        }
       }
       this.lastMsDomUpdate = now;
     }
@@ -557,10 +581,13 @@ class FlipStopwatchApp {
       this.timerSetupPanel.classList.remove('hidden');
       this.fliqloStage.classList.add('hidden');
       this.fliqloControlsBar.classList.add('hidden');
+      if (this.msLabel) this.msLabel.textContent = 'GEÇEN';
+      if (this.msDisplay) this.msDisplay.textContent = '00:00:00';
       this.syncTimerFromInputs();
     } else if (this.mode === 'stopwatch') {
       this.cards.setAllInstant('00', '00', '00');
-      this.msDisplay.textContent = '.00';
+      if (this.msLabel) this.msLabel.textContent = 'MS';
+      if (this.msDisplay) this.msDisplay.textContent = '.00';
     }
   }
 

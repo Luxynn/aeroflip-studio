@@ -264,6 +264,29 @@
     </div>
   </div>
 
+  <!-- Premium Glassmorphic Confirmation Modal Dialog -->
+  <div class="modal-backdrop confirm-dialog-backdrop hidden" id="confirmModalBackdrop">
+    <div class="fliqlo-modal confirm-dialog-modal">
+      <div class="confirm-glow-ambient" id="confirmModalGlow"></div>
+      <div class="confirm-icon-badge" id="confirmModalIconBadge">
+        <svg id="confirmModalIconSvg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <polyline points="3 6 5 6 21 6"></polyline>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          <line x1="10" y1="11" x2="10" y2="17"></line>
+          <line x1="14" y1="11" x2="14" y2="17"></line>
+        </svg>
+      </div>
+      <div class="confirm-text-group">
+        <h3 class="confirm-modal-title" id="confirmModalTitle">Oturumu Sil</h3>
+        <p class="confirm-modal-message" id="confirmModalMessage">Bu oturum kaydını silmek istediğinize emin misiniz? Bu işlem geri alınamaz.</p>
+      </div>
+      <div class="confirm-actions-row">
+        <button class="confirm-btn cancel" id="confirmModalCancelBtn">Vazgeç</button>
+        <button class="confirm-btn danger" id="confirmModalConfirmBtn">Evet, Sil</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Save Session Modal Dialog -->
   <div class="modal-backdrop hidden" id="saveModalBackdrop">
     <div class="fliqlo-modal save-modal">
@@ -286,6 +309,15 @@
         <div class="form-group">
           <label for="sessionNameInput">Oturum İsmi / Not</label>
           <input type="text" id="sessionNameInput" placeholder="Örn: 25 Dk Pomodoro, 100m Koşu" maxlength="35">
+        </div>
+
+        <!-- Laps List & Naming Area in Save Modal -->
+        <div class="save-laps-section hidden" id="saveLapsSection">
+          <div class="save-laps-header">
+            <label>Tur & Ara Kayıt Notları</label>
+            <span class="save-laps-hint">İsteğe bağlı olarak turlarınıza özel isim veya not verebilirsiniz</span>
+          </div>
+          <div class="save-laps-list" id="saveLapsList"></div>
         </div>
       </div>
       <div class="modal-footer">

@@ -51,6 +51,8 @@ class HistoryManager {
     this.saveSummaryTotal = document.getElementById('saveSummaryTotal');
     this.saveSummaryLaps = document.getElementById('saveSummaryLaps');
     this.sessionNameInput = document.getElementById('sessionNameInput');
+    this.saveLapsSection = document.getElementById('saveLapsSection');
+    this.saveLapsList = document.getElementById('saveLapsList');
   }
 
   init() {
@@ -167,6 +169,28 @@ class HistoryManager {
     this.saveSummaryTotal.textContent = FliqloUtils.formatTime(duration);
     this.saveSummaryLaps.textContent = subInfo;
 
+    // Render laps list for custom naming/notes
+    if (this.app.laps && this.app.laps.length > 0) {
+      if (this.saveLapsSection) this.saveLapsSection.classList.remove('hidden');
+      if (this.saveLapsList) {
+        const sortedLaps = [...this.app.laps].sort((a, b) => (a.index || 0) - (b.index || 0));
+        this.saveLapsList.innerHTML = sortedLaps.map(l => {
+          const typeLabel = this.app.mode === 'stopwatch' ? `Tur #${String(l.index).padStart(2, '0')}` : `Ara #${String(l.index).padStart(2, '0')}`;
+          const timeText = this.app.mode === 'stopwatch' ? `+${FliqloUtils.formatTime(l.split)}` : `${FliqloUtils.formatTime(l.remaining)} kala`;
+          return `
+            <div class="save-lap-row">
+              <span class="save-lap-badge">${typeLabel}</span>
+              <span class="save-lap-time">${timeText}</span>
+              <input type="text" class="save-lap-input" data-lap-index="${l.index}" placeholder="Tur adı / açıklaması..." value="${l.name || ''}" maxlength="35">
+            </div>
+          `;
+        }).join('');
+      }
+    } else {
+      if (this.saveLapsSection) this.saveLapsSection.classList.add('hidden');
+      if (this.saveLapsList) this.saveLapsList.innerHTML = '';
+    }
+
     this.saveModalBackdrop.classList.remove('hidden');
     setTimeout(() => this.sessionNameInput.focus(), 100);
   }
@@ -182,10 +206,24 @@ class HistoryManager {
     const now = new Date();
     const dateStr = now.toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
 
+    // Collect custom lap names from save inputs
+    const lapInputs = this.saveLapsList ? this.saveLapsList.querySelectorAll('.save-lap-input') : [];
+    const lapNameMap = new Map();
+    lapInputs.forEach(inp => {
+      const idx = parseInt(inp.dataset.lapIndex, 10);
+      const val = inp.value.trim();
+      if (idx && val) lapNameMap.set(idx, val);
+    });
+
+    const lapsWithNames = this.app.laps.map(l => ({
+      ...l,
+      name: lapNameMap.get(l.index) || l.name || ''
+    }));
+
     let newSession = null;
 
     if (this.app.mode === 'stopwatch') {
-      let bestLap = this.app.laps.length > 0 ? Math.min(...this.app.laps.map(l => l.split)) : null;
+      let bestLap = lapsWithNames.length > 0 ? Math.min(...lapsWithNames.map(l => l.split)) : null;
       newSession = {
         id: Date.now().toString(),
         name: name,
@@ -193,7 +231,7 @@ class HistoryManager {
         date: dateStr,
         timestamp: now.getTime(),
         totalMs: this.app.elapsedTime,
-        laps: [...this.app.laps],
+        laps: lapsWithNames,
         bestLapMs: bestLap,
       };
     } else {
@@ -207,22 +245,26 @@ class HistoryManager {
         targetDurationMs: this.app.timerDurationMs,
         elapsedMs: elapsed,
         remainingMs: this.app.timerRemainingMs,
-        laps: [...this.app.laps],
+        laps: lapsWithNames,
       };
     }
 
     this.storage.addSession(newSession);
+    this.selectedSessionIds.add(newSession.id);
+    this.saveSelection();
     this.updateSessionBadge();
     this.closeSaveModal();
 
     this.historyFilter = this.app.mode;
-    this.openHistoryModal();
+    this.openHistoryModal('list');
+    if (this.ui) this.ui.showToast('Oturum Başarıyla Kaydedildi', '💾');
   }
 
-  openHistoryModal() {
+  openHistoryModal(forceTab = null) {
     this.historyModalBackdrop.classList.remove('hidden');
     this.setHistoryFilter(this.historyFilter);
-    this.switchTab(this.activeTab);
+    const tabToOpen = forceTab || this.activeTab;
+    this.switchTab(tabToOpen);
   }
 
   closeHistoryModal() {
@@ -267,12 +309,31 @@ class HistoryManager {
     }
   }
 
-  deleteSession(id) {
+  async deleteSession(id) {
+    const session = this.storage.getAll().find(s => s.id === id);
+    const sessionName = session && session.name ? session.name : 'Bu oturum';
+    
+    let confirmed = false;
+    if (this.ui && typeof this.ui.confirmDialog === 'function') {
+      confirmed = await this.ui.confirmDialog({
+        title: 'Oturumu Sil',
+        message: `"${sessionName}" adlı oturum kaydını kalıcı olarak silmek istediğinize emin misiniz?`,
+        confirmText: 'Evet, Sil',
+        cancelText: 'Vazgeç',
+        icon: 'trash'
+      });
+    } else {
+      confirmed = window.confirm(`"${sessionName}" adlı oturum kaydını silmek istediğinize emin misiniz?`);
+    }
+
+    if (!confirmed) return;
+
     this.storage.deleteSession(id);
     this.selectedSessionIds.delete(id);
     this.saveSelection();
     this.updateSessionBadge();
     this.renderSavedList();
+    if (this.ui) this.ui.showToast('Oturum kaydı silindi', '🗑️');
   }
 
   toggleSelectSession(id) {
@@ -403,7 +464,10 @@ class HistoryManager {
                 if (session.type === 'stopwatch') {
                   return `
                     <div class="session-lap-row ${l.split === session.bestLapMs ? 'best' : ''}">
-                      <span>Tur #${String(l.index).padStart(2, '0')}</span>
+                      <span style="display:inline-flex; align-items:center; gap:6px;">
+                        <span>Tur #${String(l.index).padStart(2, '0')}</span>
+                        ${l.name ? `<em style="color:#60a5fa; font-style:normal; font-size:0.8rem; font-weight:600;">(${l.name})</em>` : ''}
+                      </span>
                       <span>+${FliqloUtils.formatTime(l.split)}</span>
                       <span>${FliqloUtils.formatTime(l.total)}</span>
                     </div>
@@ -411,7 +475,10 @@ class HistoryManager {
                 } else {
                   return `
                     <div class="session-lap-row">
-                      <span>Ara Kayıt #${String(l.index).padStart(2, '0')}</span>
+                      <span style="display:inline-flex; align-items:center; gap:6px;">
+                        <span>Ara Kayıt #${String(l.index).padStart(2, '0')}</span>
+                        ${l.name ? `<em style="color:#60a5fa; font-style:normal; font-size:0.8rem; font-weight:600;">(${l.name})</em>` : ''}
+                      </span>
                       <span>+${FliqloUtils.formatTime(l.split)} fark</span>
                       <span style="color:#22c55e;">${FliqloUtils.formatTime(l.remaining)} kala</span>
                     </div>

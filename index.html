@@ -65,33 +65,33 @@
     <!-- Top Mode Switcher (Saat / Kronometre / Geri Sayım) -->
     <header class="fliqlo-header-nav">
       <div class="mode-switch-wrap">
-        <button class="mode-pill" id="modeClockBtn" data-mode="clock" data-tooltip="Canlı Saat Modu" data-tooltip-sub="Sistem saatini Fliqlo mekanik kartlarıyla canlı gösterir [C veya 1]">
+        <button class="mode-pill" id="modeClockBtn" data-mode="clock" data-i18n-tooltip="tooltip_mode_clock_title" data-i18n-tooltip-sub="tooltip_mode_clock_sub" data-tooltip="Canlı Saat Modu" data-tooltip-sub="Sistem saatini Fliqlo mekanik kartlarıyla canlı gösterir [C veya 1]">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline><path d="M12 2v2"></path></svg>
-          <span>Saat</span>
+          <span data-i18n="mode_clock">Saat</span>
         </button>
-        <button class="mode-pill active" id="modeStopwatchBtn" data-mode="stopwatch" data-tooltip="Kronometre Modu" data-tooltip-sub="Hassas ileri sayım ve tur kaydı yapar [W veya 2]">
+        <button class="mode-pill active" id="modeStopwatchBtn" data-mode="stopwatch" data-i18n-tooltip="tooltip_mode_stopwatch_title" data-i18n-tooltip-sub="tooltip_mode_stopwatch_sub" data-tooltip="Kronometre Modu" data-tooltip-sub="Hassas ileri sayım ve tur kaydı yapar [W veya 2]">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-          <span>Kronometre</span>
+          <span data-i18n="mode_stopwatch">Kronometre</span>
         </button>
-        <button class="mode-pill" id="modeTimerBtn" data-mode="timer" data-tooltip="Geri Sayım Modu" data-tooltip-sub="Belirlenen süreden geriye sayar ve alarm çalar [T veya 3]">
+        <button class="mode-pill" id="modeTimerBtn" data-mode="timer" data-i18n-tooltip="tooltip_mode_timer_title" data-i18n-tooltip-sub="tooltip_mode_timer_sub" data-tooltip="Geri Sayım Modu" data-tooltip-sub="Belirlenen süreden geriye sayar ve alarm çalar [T veya 3]">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 22h14"></path><path d="M5 2h14"></path><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"></path><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"></path></svg>
-          <span>Geri Sayım</span>
+          <span data-i18n="mode_timer">Geri Sayım</span>
         </button>
       </div>
 
       <div class="header-aux-actions">
         <!-- Screen Wake Lock Toggle -->
-        <button id="wakeLockBtn" class="icon-only-btn" data-tooltip="Ekranı Uyanık Tut" data-tooltip-sub="Sayaç veya saat açıkken ekranın kararmasını / uykuya geçmesini engeller [K]">
+        <button id="wakeLockBtn" class="icon-only-btn" data-i18n-tooltip="tooltip_wakelock_title" data-i18n-tooltip-sub="tooltip_wakelock_sub" data-tooltip="Ekranı Uyanık Tut" data-tooltip-sub="Sayaç veya saat açıkken ekranın kararmasını / uykuya geçmesini engeller [K]">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path><circle cx="12" cy="12" r="4"></circle></svg>
         </button>
 
         <!-- Ambience & Background Mode Toggle (Rain, Fireplace, Stars, Pure Dark) -->
-        <button id="ambienceToggleBtn" class="icon-only-btn active-accent" data-tooltip="Atmosfer & Ambiyans" data-tooltip-sub="Yağmur, Şömine, Kozmik Gece ve Mat Siyah arasında geçiş yapar [Y]">
+        <button id="ambienceToggleBtn" class="icon-only-btn active-accent" data-i18n-tooltip="tooltip_ambience_title" data-i18n-tooltip-sub="tooltip_ambience_sub" data-tooltip="Atmosfer & Ambiyans" data-tooltip-sub="Yağmur, Şömine, Kozmik Gece ve Mat Siyah arasında geçiş yapar [Y]">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"></path><path d="M8 19v2"></path><path d="M8 13v2"></path><path d="M16 19v2"></path><path d="M16 13v2"></path><path d="M12 21v2"></path><path d="M12 15v2"></path></svg>
         </button>
 
         <!-- History & Compare Modal Toggle -->
-        <button id="historyModalBtn" class="icon-only-btn" data-tooltip="Kayıtlar & Kıyaslama" data-tooltip-sub="Kayıtlı oturumları ve tur analizlerini görüntüler [H]">
+        <button id="historyModalBtn" class="icon-only-btn" data-i18n-tooltip="tooltip_history_title" data-i18n-tooltip-sub="tooltip_history_sub" data-tooltip="Kayıtlar & Kıyaslama" data-tooltip-sub="Kayıtlı oturumları ve tur analizlerini görüntüler [H]">
           <div class="btn-badge-wrap">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
             <span class="session-count-badge" id="sessionCountBadge">0</span>
@@ -99,34 +99,35 @@
         </button>
 
         <!-- Sound Toggle -->
-        <button id="soundToggleBtn" class="icon-only-btn" data-tooltip="Mekanik Kart Sesi" data-tooltip-sub="Fliqlo kart çevirme klik ses efektini açar / kapatır [S]">
+        <button id="soundToggleBtn" class="icon-only-btn" data-i18n-tooltip="tooltip_sound_title" data-i18n-tooltip-sub="tooltip_sound_sub" data-tooltip="Mekanik Kart Sesi" data-tooltip-sub="Fliqlo kart çevirme klik ses efektini açar / kapatır [S]">
           <svg class="sound-on" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
           <svg class="sound-off hidden" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
         </button>
 
         <!-- Settings Modal Toggle -->
-        <button id="settingsModalBtn" class="icon-only-btn" data-tooltip="Ayarlar" data-tooltip-sub="Kısayollar, dil, veri yedekleme ve sistem tercihleri [O]">
+        <button id="settingsModalBtn" class="icon-only-btn" data-i18n-tooltip="tooltip_settings_title" data-i18n-tooltip-sub="tooltip_settings_sub" data-tooltip="Ayarlar" data-tooltip-sub="Kısayollar, dil, saat formatı ve veri yönetimi [O]">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
         </button>
 
         <!-- Fullscreen -->
-        <button id="fullscreenBtn" class="icon-only-btn" data-tooltip="Tam Ekran Modu" data-tooltip-sub="Masa saati görünümü için tam ekrana geçer [F]">
+        <button id="fullscreenBtn" class="icon-only-btn" data-i18n-tooltip="tooltip_fullscreen_title" data-i18n-tooltip-sub="tooltip_fullscreen_sub" data-tooltip="Tam Ekran Modu" data-tooltip-sub="Masa saati görünümü için tam ekrana geçer [F]">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
         </button>
       </div>
     </header>
 
     <!-- Timer Setup Screen (Visible ONLY in Timer mode when idle/reset) -->
+    <!-- Timer Setup Screen (Visible ONLY in Timer mode when idle/reset) -->
     <section class="timer-setup-screen hidden" id="timerSetupPanel">
       <div class="setup-card">
         <div class="setup-header">
-          <h3>GERİ SAYIM SÜRESİ BELİRLE</h3>
-          <p>Başlatmak istediğiniz süreyi girin veya hazır butonları kullanın</p>
+          <h3 data-i18n="timer_setup_title">GERİ SAYIM SÜRESİ BELİRLE</h3>
+          <p data-i18n="timer_setup_sub">Başlatmak istediğiniz süreyi girin veya hazır butonları kullanın</p>
         </div>
 
         <div class="timer-input-group">
           <div class="time-spinner">
-            <label>SAAT</label>
+            <label data-i18n="label_hours">SAAT</label>
             <div class="spinner-control">
               <button class="spin-btn" id="hourDownBtn">&minus;</button>
               <input type="number" id="timerInputHours" min="0" max="99" value="00">
@@ -137,7 +138,7 @@
           <span class="spinner-colon">:</span>
 
           <div class="time-spinner">
-            <label>DAKİKA</label>
+            <label data-i18n="label_minutes">DAKİKA</label>
             <div class="spinner-control">
               <button class="spin-btn" id="minDownBtn">&minus;</button>
               <input type="number" id="timerInputMinutes" min="0" max="59" value="05">
@@ -148,7 +149,7 @@
           <span class="spinner-colon">:</span>
 
           <div class="time-spinner">
-            <label>SANİYE</label>
+            <label data-i18n="label_seconds">SANİYE</label>
             <div class="spinner-control">
               <button class="spin-btn" id="secDownBtn">&minus;</button>
               <input type="number" id="timerInputSeconds" min="0" max="59" value="00">
@@ -158,17 +159,17 @@
         </div>
 
         <div class="timer-presets">
-          <button class="preset-pill" data-time="60">+1 Dk</button>
-          <button class="preset-pill" data-time="300">+5 Dk</button>
+          <button class="preset-pill" data-time="60" data-i18n="preset_1m">+1 Dk</button>
+          <button class="preset-pill" data-time="300" data-i18n="preset_5m">+5 Dk</button>
           <button class="preset-pill" data-time="600">+10 Dk</button>
-          <button class="preset-pill" data-time="1500">+25 Dk (Pomodoro)</button>
+          <button class="preset-pill" data-time="1500" data-i18n="preset_25m">+25 Dk (Odak)</button>
           <button class="preset-pill" data-time="3600">+1 Saat</button>
-          <button class="preset-pill reset-preset" id="clearTimerPresetBtn">Sıfırla</button>
+          <button class="preset-pill reset-preset" id="clearTimerPresetBtn" data-i18n="btn_clear">Sıfırla</button>
         </div>
 
         <button class="setup-start-btn" id="setupStartBtn">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-          <span>Geri Sayımı Başlat</span>
+          <span data-i18n="btn_start_countdown">Geri Sayımı Başlat</span>
         </button>
       </div>
     </section>
@@ -243,13 +244,13 @@
       <!-- Stopwatch / Timer Controls Group -->
       <div class="timer-controls-group" id="timerControlsGroup">
         <!-- Reset -->
-        <button id="resetBtn" class="action-btn secondary" title="Sıfırla (R)" disabled>
+        <button id="resetBtn" class="action-btn secondary" data-i18n-title="btn_reset" title="Sıfırla (R)" disabled>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
-          <span>Sıfırla</span>
+          <span data-i18n="btn_reset">Sıfırla</span>
         </button>
 
         <!-- Start / Pause -->
-        <button id="startPauseBtn" class="action-btn primary" title="Başlat / Duraklat (Boşluk Tuşu)">
+        <button id="startPauseBtn" class="action-btn primary" data-i18n-title="btn_start" title="Başlat / Duraklat (Boşluk Tuşu)">
           <svg class="icon-play" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
             <polygon points="5 3 19 12 5 21 5 3"></polygon>
           </svg>
@@ -257,19 +258,19 @@
             <rect x="6" y="4" width="4" height="16" rx="1"></rect>
             <rect x="14" y="4" width="4" height="16" rx="1"></rect>
           </svg>
-          <span id="startPauseText">Başlat</span>
+          <span id="startPauseText" data-i18n="btn_start">Başlat</span>
         </button>
 
         <!-- Lap (Tur / Ara Kayıt) -->
-        <button id="lapBtn" class="action-btn secondary" title="Tur / Ara Kayıt (L)" disabled>
+        <button id="lapBtn" class="action-btn secondary" data-i18n-title="btn_lap" title="Tur / Ara Kayıt (L)" disabled>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
-          <span id="lapBtnText">Tur</span>
+          <span id="lapBtnText" data-i18n="btn_lap">Tur</span>
         </button>
 
         <!-- Save Session Button -->
-        <button id="saveSessionBtn" class="action-btn save-btn" title="Oturumu Kaydet" disabled>
+        <button id="saveSessionBtn" class="action-btn save-btn" data-i18n-title="btn_save_tooltip" title="Oturumu Kaydet" disabled>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-          <span>Kaydet</span>
+          <span data-i18n="btn_save">Kaydet</span>
         </button>
       </div>
 
@@ -277,11 +278,11 @@
       <div class="clock-controls-group hidden" id="clockControlsGroup">
         <button id="toggle1224Btn" class="action-btn secondary" title="12s / 24s Saat Formatını Değiştir">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-          <span id="clockFormatText">24 Saat Formatı</span>
+          <span id="clockFormatText" data-i18n="format_24h_btn">24 Saat Formatı</span>
         </button>
         <div class="clock-live-indicator">
           <span class="live-pulse-dot"></span>
-          <span>CANLI SAAT</span>
+          <span data-i18n="live_clock_badge">CANLI SAAT</span>
         </div>
       </div>
     </nav>
@@ -290,8 +291,8 @@
     <section class="laps-tray" id="lapsContainer">
       <div class="laps-header">
         <span>#</span>
-        <span id="lapsHeaderSplit">TUR ZAMANI</span>
-        <span id="lapsHeaderTotal">TOPLAM SÜRE</span>
+        <span id="lapsHeaderSplit" data-i18n="laps_header_split">TUR ZAMANI</span>
+        <span id="lapsHeaderTotal" data-i18n="laps_header_total">TOPLAM SÜRE</span>
       </div>
       <div class="laps-list" id="lapsList"></div>
     </section>
@@ -302,10 +303,10 @@
     <div class="alarm-content">
       <svg class="alarm-bell" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
       <div>
-        <h4>SÜRE DOLDU!</h4>
-        <p id="alarmToastMsg">Geri sayım tamamlandı.</p>
+        <h4 data-i18n="alarm_title">SÜRE DOLDU!</h4>
+        <p id="alarmToastMsg" data-i18n="alarm_sub">Geri sayım tamamlandı.</p>
       </div>
-      <button class="alarm-dismiss-btn" id="dismissAlarmBtn">Tamam</button>
+      <button class="alarm-dismiss-btn" id="dismissAlarmBtn" data-i18n="btn_dismiss">Tamam</button>
     </div>
   </div>
 
@@ -322,12 +323,12 @@
         </svg>
       </div>
       <div class="confirm-text-group">
-        <h3 class="confirm-modal-title" id="confirmModalTitle">Oturumu Sil</h3>
-        <p class="confirm-modal-message" id="confirmModalMessage">Bu oturum kaydını silmek istediğinize emin misiniz? Bu işlem geri alınamaz.</p>
+        <h3 class="confirm-modal-title" id="confirmModalTitle" data-i18n="delete_modal_title">Oturumu Sil</h3>
+        <p class="confirm-modal-message" id="confirmModalMessage" data-i18n="delete_modal_msg">Bu oturum kaydını silmek istediğinize emin misiniz? Bu işlem geri alınamaz.</p>
       </div>
       <div class="confirm-actions-row">
-        <button class="confirm-btn cancel" id="confirmModalCancelBtn">Vazgeç</button>
-        <button class="confirm-btn danger" id="confirmModalConfirmBtn">Evet, Sil</button>
+        <button class="confirm-btn cancel" id="confirmModalCancelBtn" data-i18n="btn_cancel">Vazgeç</button>
+        <button class="confirm-btn danger" id="confirmModalConfirmBtn" data-i18n="btn_confirm_delete">Evet, Sil</button>
       </div>
     </div>
   </div>
@@ -336,38 +337,38 @@
   <div class="modal-backdrop hidden" id="saveModalBackdrop">
     <div class="fliqlo-modal save-modal">
       <div class="modal-header">
-        <h3 id="saveModalTitle">OTURUMU KAYDET</h3>
+        <h3 id="saveModalTitle" data-i18n="save_modal_title">OTURUMU KAYDET</h3>
         <button class="modal-close-btn" id="closeSaveModalBtn">&times;</button>
       </div>
       <div class="modal-body">
         <div class="save-summary-card">
           <div class="summary-item">
-            <span class="summary-label" id="saveSummaryLabel1">GEÇEN / TOPLAM SÜRE</span>
+            <span class="summary-label" id="saveSummaryLabel1" data-i18n="laps_header_total">GEÇEN / TOPLAM SÜRE</span>
             <span class="summary-val" id="saveSummaryTotal">00:00:00.00</span>
           </div>
           <div class="summary-item">
-            <span class="summary-label" id="saveSummaryLabel2">KALAN / TUR</span>
+            <span class="summary-label" id="saveSummaryLabel2" data-i18n="stat_lap_count">KALAN / TUR</span>
             <span class="summary-val" id="saveSummaryLaps">0 Tur</span>
           </div>
         </div>
 
         <div class="form-group">
-          <label for="sessionNameInput">Oturum İsmi / Not</label>
-          <input type="text" id="sessionNameInput" placeholder="Örn: 25 Dk Pomodoro, 100m Koşu" maxlength="35">
+          <label for="sessionNameInput" data-i18n="label_session_title">Oturum İsmi / Not</label>
+          <input type="text" id="sessionNameInput" data-i18n-placeholder="session_title_placeholder" placeholder="Örn: 25 Dk Pomodoro, 100m Koşu" maxlength="35">
         </div>
 
         <!-- Laps List & Naming Area in Save Modal -->
         <div class="save-laps-section hidden" id="saveLapsSection">
           <div class="save-laps-header">
-            <label>Tur & Ara Kayıt Notları</label>
+            <label data-i18n="label_lap_names">Tur & Ara Kayıt Notları</label>
             <span class="save-laps-hint">İsteğe bağlı olarak turlarınıza özel isim veya not verebilirsiniz</span>
           </div>
           <div class="save-laps-list" id="saveLapsList"></div>
         </div>
       </div>
       <div class="modal-footer">
-        <button class="modal-btn cancel" id="cancelSaveBtn">Vazgeç</button>
-        <button class="modal-btn confirm" id="confirmSaveBtn">Kaydet</button>
+        <button class="modal-btn cancel" id="cancelSaveBtn" data-i18n="btn_cancel">Vazgeç</button>
+        <button class="modal-btn confirm" id="confirmSaveBtn" data-i18n="btn_save_session_confirm">Kaydet</button>
       </div>
     </div>
   </div>
@@ -377,8 +378,8 @@
     <div class="fliqlo-modal history-modal">
       <div class="modal-header">
         <div class="modal-tabs">
-          <button class="modal-tab active" id="tabSavedList">Kayıtlı Oturumlar</button>
-          <button class="modal-tab" id="tabCompare">Kıyaslama Analizi</button>
+          <button class="modal-tab active" id="tabSavedList" data-i18n="tab_history_sessions">Kayıtlı Oturumlar</button>
+          <button class="modal-tab" id="tabCompare" data-i18n="tab_history_compare">Kıyaslama Analizi</button>
         </div>
         <button class="modal-close-btn" id="closeHistoryModalBtn">&times;</button>
       </div>
@@ -387,11 +388,11 @@
         <div class="tab-view active" id="viewSavedList">
           <div class="history-type-filter">
             <button class="filter-type-pill active" id="filterStopwatchBtn" data-filter="stopwatch">
-              <span>⏱️ Kronometre Kayıtları</span>
+              <span data-i18n="filter_stopwatch">⏱️ Kronometre Kayıtları</span>
               <span class="type-badge" id="countStopwatchBadge">0</span>
             </button>
             <button class="filter-type-pill" id="filterTimerBtn" data-filter="timer">
-              <span>⏳ Geri Sayım Kayıtları</span>
+              <span data-i18n="filter_timer">⏳ Geri Sayım Kayıtları</span>
               <span class="type-badge" id="countTimerBadge">0</span>
             </button>
           </div>
@@ -400,14 +401,14 @@
             <div class="history-select-group">
               <label class="select-all-toggle-btn" id="selectAllToggleBtn" title="Tümünü Seç / Seçimi Temizle">
                 <input type="checkbox" id="selectAllCheckbox" class="session-select-checkbox">
-                <span id="selectAllLabel">Tümünü Seç</span>
+                <span id="selectAllLabel" data-i18n="btn_select_all">Tümünü Seç</span>
               </label>
               <div class="selection-status-divider"></div>
-              <div class="selection-status" id="selectionStatus">Kıyaslamak için oturum seçin (en az 2)</div>
+              <div class="selection-status" id="selectionStatus" data-i18n="compare_select_hint">Kıyaslamak için oturum seçin (en az 2)</div>
             </div>
             <button class="compare-action-btn" id="launchCompareBtn" disabled>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
-              <span>Seçilenleri Kıyasla</span>
+              <span data-i18n="btn_compare_selected">Seçilenleri Kıyasla</span>
             </button>
           </div>
 
@@ -426,9 +427,9 @@
     <div class="fliqlo-modal settings-modal">
       <div class="modal-header">
         <div class="modal-tabs">
-          <button class="modal-tab active" id="tabSettingsShortcuts">⌨️ Klavye Kısayolları</button>
-          <button class="modal-tab" id="tabSettingsGeneral">🌍 Dil & Tercihler</button>
-          <button class="modal-tab" id="tabSettingsData">💾 Veri & Yedekleme</button>
+          <button class="modal-tab active" id="tabSettingsShortcuts" data-i18n="tab_settings_keybinds">⌨️ Klavye Kısayolları</button>
+          <button class="modal-tab" id="tabSettingsGeneral" data-i18n="tab_settings_general">🌍 Dil & Tercihler</button>
+          <button class="modal-tab" id="tabSettingsData" data-i18n="tab_settings_data">💾 Veri & Yedekleme</button>
         </div>
         <button class="modal-close-btn" id="closeSettingsModalBtn">&times;</button>
       </div>
@@ -437,14 +438,14 @@
         <!-- Tab 1: Keyboard Shortcuts Rebinding -->
         <div class="tab-view active" id="viewSettingsShortcuts">
           <div class="settings-section-header">
-            <h4>Özelleştirilebilir Kısayol Tuşları</h4>
-            <p>Değiştirmek istediğiniz tuşa tıklayıp klavyenizden yeni bir tuşa basın.</p>
+            <h4 data-i18n="keybind_section_title">Özelleştirilebilir Kısayol Tuşları</h4>
+            <p data-i18n="keybind_section_sub">Değiştirmek istediğiniz tuşa tıklayıp klavyenizden yeni bir tuşa basın.</p>
           </div>
 
           <div class="shortcuts-grid" id="shortcutsListGrid"></div>
 
           <div class="shortcuts-footer-actions">
-            <button class="modal-btn secondary-action" id="resetShortcutsBtn">Varsayılan Kısayollara Dön</button>
+            <button class="modal-btn secondary-action" id="resetShortcutsBtn" data-i18n="btn_reset_keybinds">Varsayılan Kısayollara Dön</button>
           </div>
 
           <!-- Creator & Signature Info Card -->
@@ -461,12 +462,12 @@
         <!-- Tab 2: General & Language -->
         <div class="tab-view" id="viewSettingsGeneral">
           <div class="settings-section-header">
-            <h4>Dil & Arayüz Tercihleri</h4>
-            <p>Uygulama genel görünüm ve varsayılan davranış ayarları.</p>
+            <h4 data-i18n="general_section_title">Dil & Arayüz Tercihleri</h4>
+            <p data-i18n="general_section_sub">Uygulama genel görünüm ve varsayılan davranış ayarları.</p>
           </div>
 
           <div class="settings-group">
-            <label class="settings-label">Uygulama Dili</label>
+            <label class="settings-label" data-i18n="label_app_language">Uygulama Dili</label>
             <div class="language-options-group">
               <button class="lang-option-btn active" id="langTrBtn" data-lang="tr">
                 <span class="lang-flag">🇹🇷</span>
@@ -482,11 +483,19 @@
           </div>
 
           <div class="settings-group">
-            <label class="settings-label">Açılış Varsayılan Modu</label>
+            <label class="settings-label" data-i18n="label_clock_format">Saat Formatı (Canlı Saat)</label>
+            <select class="settings-select" id="clockFormatSelect">
+              <option value="24h" data-i18n="opt_format_24h">24 Saat Formatı (Standart)</option>
+              <option value="12h" data-i18n="opt_format_12h">12 Saat Formatı (AM / PM)</option>
+            </select>
+          </div>
+
+          <div class="settings-group">
+            <label class="settings-label" data-i18n="label_default_mode">Açılış Varsayılan Modu</label>
             <select class="settings-select" id="defaultModeSelect">
-              <option value="stopwatch">Kronometre (Stopwatch)</option>
-              <option value="clock">Canlı Saat (Clock)</option>
-              <option value="timer">Geri Sayım (Timer)</option>
+              <option value="stopwatch" data-i18n="opt_mode_stopwatch">Kronometre (Stopwatch)</option>
+              <option value="clock" data-i18n="opt_mode_clock">Canlı Saat (Clock)</option>
+              <option value="timer" data-i18n="opt_mode_timer">Geri Sayım (Timer)</option>
             </select>
           </div>
         </div>
@@ -494,63 +503,63 @@
         <!-- Tab 3: Data & Backup -->
         <div class="tab-view" id="viewSettingsData">
           <div class="settings-section-header">
-            <h4>Kayıtlı Veriler & Yedekleme</h4>
-            <p>Oturum ve tur verilerinizi cihazınıza aktarın veya yedekten geri yükleyin.</p>
+            <h4 data-i18n="data_section_title">Kayıtlı Veriler & Yedekleme</h4>
+            <p data-i18n="data_section_sub">Oturum ve tur verilerinizi cihazınıza aktarın veya yedekten geri yükleyin.</p>
           </div>
 
           <div class="data-actions-grid">
             <div class="data-card">
               <div class="data-card-info">
-                <h5>Excel (.xlsx) Raporu</h5>
-                <p>Özet, Oturumlar ve Turlar olmak üzere 3 sayfalı profesyonel Excel tablosu oluşturun.</p>
+                <h5 data-i18n="card_excel_title">Excel (.xlsx) Raporu</h5>
+                <p data-i18n="card_excel_sub">Özet, Oturumlar ve Turlar olmak üzere 3 sayfalı profesyonel Excel tablosu oluşturun.</p>
               </div>
               <button class="data-action-btn primary-excel" id="exportExcelBtn">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="8" y1="13" x2="16" y2="13"></line><line x1="8" y1="17" x2="16" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                <span>📊 Excel'e Aktar</span>
+                <span data-i18n="btn_export_excel">📊 Excel'e Aktar</span>
               </button>
             </div>
 
             <div class="data-card">
               <div class="data-card-info">
-                <h5>CSV Tablo Dışa Aktarımı</h5>
-                <p>Excel ve tablolarda açmak için turları CSV formatında dışa aktarın.</p>
+                <h5 data-i18n="card_csv_title">CSV Tablo Dışa Aktarımı</h5>
+                <p data-i18n="card_csv_sub">Excel ve tablolarda açmak için turları CSV formatında dışa aktarın.</p>
               </div>
               <button class="data-action-btn" id="exportCsvBtn">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                <span>CSV İndir</span>
+                <span data-i18n="btn_export_csv">CSV İndir</span>
               </button>
             </div>
 
             <div class="data-card">
               <div class="data-card-info">
-                <h5>JSON Formatında Yedekle</h5>
-                <p>Tüm oturum ve tur geçmişinizi JSON dosyası olarak indirin.</p>
+                <h5 data-i18n="card_json_title">JSON Formatında Yedekle</h5>
+                <p data-i18n="card_json_sub">Tüm oturum ve tur geçmişinizi JSON dosyası olarak indirin.</p>
               </div>
               <button class="data-action-btn secondary" id="exportJsonBtn">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                <span>JSON İndir</span>
+                <span data-i18n="btn_export_json">JSON İndir</span>
               </button>
             </div>
 
             <div class="data-card">
               <div class="data-card-info">
-                <h5>Yedekten İçe Aktar (Import)</h5>
-                <p>Daha önce aldığınız bir JSON yedeğini yükleyerek geçmişinizi geri getirin.</p>
+                <h5 data-i18n="card_import_title">Yedekten İçe Aktar (Import)</h5>
+                <p data-i18n="card_import_sub">Daha önce aldığınız bir JSON yedeğini yükleyerek geçmişinizi geri getirin.</p>
               </div>
               <button class="data-action-btn secondary" id="importBackupBtn">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                <span>Yedek Yükle</span>
+                <span data-i18n="btn_import_backup">Yedek Yükle</span>
               </button>
             </div>
 
             <div class="data-card danger">
               <div class="data-card-info">
-                <h5>Tüm Oturum Geçmişini Sıfırla</h5>
-                <p>Kayıtlı tüm kronometre ve geri sayım oturumlarını kalıcı olarak siler.</p>
+                <h5 data-i18n="card_clear_title">Tüm Oturum Geçmişini Sıfırla</h5>
+                <p data-i18n="card_clear_sub">Kayıtlı tüm kronometre ve geri sayım oturumlarını kalıcı olarak siler.</p>
               </div>
               <button class="data-action-btn danger" id="clearAllDataBtn">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                <span>Tümünü Sil</span>
+                <span data-i18n="btn_clear_all">Tümünü Sil</span>
               </button>
             </div>
           </div>
@@ -575,6 +584,7 @@
   <input type="file" id="importFileInput" accept=".json" style="display: none;">
 
   <!-- Modular Zero-Server Scripts -->
+  <script src="js/i18n.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/audio.js"></script>
   <script src="js/rain.js"></script>

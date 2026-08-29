@@ -1,16 +1,16 @@
 const DEFAULT_KEYBINDS = {
-  startPause: { label: 'Başlat / Duraklat', code: 'Space', display: 'SPACE' },
-  reset: { label: 'Sıfırla', code: 'KeyR', display: 'R' },
-  lap: { label: 'Tur / Ara Kayıt', code: 'KeyL', display: 'L' },
-  clockMode: { label: 'Saat Modu', code: 'KeyC', display: 'C' },
-  stopwatchMode: { label: 'Kronometre Modu', code: 'KeyW', display: 'W' },
-  timerMode: { label: 'Geri Sayım Modu', code: 'KeyT', display: 'T' },
-  wakeLock: { label: 'Ekranı Uyanık Tut (Wake Lock)', code: 'KeyK', display: 'K' },
-  sound: { label: 'Mekanik Kart Sesi', code: 'KeyS', display: 'S' },
-  rain: { label: 'Yağmur Efekti', code: 'KeyY', display: 'Y' },
-  fullscreen: { label: 'Tam Ekran Modu', code: 'KeyF', display: 'F' },
-  history: { label: 'Kayıtlar & Kıyaslama', code: 'KeyH', display: 'H' },
-  settings: { label: 'Ayarlar Modalı', code: 'KeyO', display: 'O' }
+  startPause: { code: 'Space', display: 'SPACE', i18nKey: 'keybind_start_pause' },
+  reset: { code: 'KeyR', display: 'R', i18nKey: 'keybind_reset' },
+  lap: { code: 'KeyL', display: 'L', i18nKey: 'keybind_lap' },
+  clockMode: { code: 'KeyC', display: 'C', i18nKey: 'keybind_mode_clock' },
+  stopwatchMode: { code: 'KeyW', display: 'W', i18nKey: 'keybind_mode_stopwatch' },
+  timerMode: { code: 'KeyT', display: 'T', i18nKey: 'keybind_mode_timer' },
+  wakeLock: { code: 'KeyK', display: 'K', i18nKey: 'keybind_wakelock' },
+  sound: { code: 'KeyS', display: 'S', i18nKey: 'keybind_sound' },
+  rain: { code: 'KeyY', display: 'Y', i18nKey: 'keybind_ambience' },
+  fullscreen: { code: 'KeyF', display: 'F', i18nKey: 'keybind_fullscreen' },
+  history: { code: 'KeyH', display: 'H', i18nKey: 'keybind_history' },
+  settings: { code: 'KeyO', display: 'O', i18nKey: 'keybind_settings' }
 };
 
 class KeybindManager {
@@ -23,12 +23,24 @@ class KeybindManager {
     this.shortcutsListGrid = document.getElementById('shortcutsListGrid');
     this.resetShortcutsBtn = document.getElementById('resetShortcutsBtn');
 
+    if (window.I18n) {
+      window.I18n.onLanguageChange(() => this.renderShortcutsGrid());
+    }
+
     this.init();
   }
 
   init() {
     this.renderShortcutsGrid();
     this.bindEvents();
+  }
+
+  getActionLabel(actionKey) {
+    const defaultItem = DEFAULT_KEYBINDS[actionKey];
+    if (defaultItem && defaultItem.i18nKey && window.I18n) {
+      return window.I18n.get(defaultItem.i18nKey);
+    }
+    return (this.keybinds[actionKey] && this.keybinds[actionKey].label) || actionKey;
   }
 
   loadKeybinds() {
@@ -55,11 +67,11 @@ class KeybindManager {
     this.keybinds = JSON.parse(JSON.stringify(DEFAULT_KEYBINDS));
     this.saveKeybinds();
     this.renderShortcutsGrid();
-    if (this.ui) this.ui.showToast('Tüm kısayollar varsayılana sıfırlandı', '🔄');
+    if (this.ui) this.ui.showToast(window.I18n ? window.I18n.get('btn_reset_keybinds') : 'Tüm kısayollar varsayılana sıfırlandı', '🔄');
   }
 
   formatKeyDisplay(code) {
-    if (!code) return 'YOK';
+    if (!code) return 'NONE';
     if (code === 'Space') return 'SPACE';
     if (code.startsWith('Key')) return code.slice(3).toUpperCase();
     if (code.startsWith('Digit')) return code.slice(5);
@@ -73,9 +85,10 @@ class KeybindManager {
     if (!this.shortcutsListGrid) return;
     this.shortcutsListGrid.innerHTML = Object.entries(this.keybinds).map(([actionKey, item]) => {
       const display = item.display || this.formatKeyDisplay(item.code);
+      const label = this.getActionLabel(actionKey);
       return `
         <div class="shortcut-row">
-          <span class="shortcut-label">${item.label}</span>
+          <span class="shortcut-label">${label}</span>
           <button class="keybind-btn" data-action="${actionKey}" title="Değiştirmek için tıklayın">
             ${display}
           </button>
@@ -91,8 +104,9 @@ class KeybindManager {
 
     this.recordingActionKey = actionKey;
     buttonEl.classList.add('recording');
-    buttonEl.textContent = 'Tuşa Basın...';
-    if (this.ui) this.ui.showToast(`"${this.keybinds[actionKey].label}" için bir tuşa basın`, '⌨️');
+    buttonEl.textContent = '...';
+    const label = this.getActionLabel(actionKey);
+    if (this.ui) this.ui.showToast(`"${label}" için bir tuşa basın`, '⌨️');
   }
 
   bindEvents() {

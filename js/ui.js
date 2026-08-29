@@ -58,11 +58,17 @@ class UIManager {
     if (!this.appTooltip) return;
 
     document.addEventListener('mouseover', (e) => {
-      const target = e.target.closest('[data-tooltip]');
+      const target = e.target.closest('[data-tooltip], [data-i18n-tooltip]');
       if (!target) return;
 
-      const title = target.getAttribute('data-tooltip') || '';
-      const sub = target.getAttribute('data-tooltip-sub') || '';
+      let title = target.getAttribute('data-tooltip') || '';
+      let sub = target.getAttribute('data-tooltip-sub') || '';
+
+      const i18nTitle = target.getAttribute('data-i18n-tooltip');
+      const i18nSub = target.getAttribute('data-i18n-tooltip-sub');
+      if (i18nTitle && window.I18n) title = window.I18n.get(i18nTitle);
+      if (i18nSub && window.I18n) sub = window.I18n.get(i18nSub);
+
       if (!title && !sub) return;
 
       if (this.tooltipTitle) this.tooltipTitle.textContent = title;
@@ -88,7 +94,7 @@ class UIManager {
     }, true);
 
     document.addEventListener('mouseout', (e) => {
-      const target = e.target.closest('[data-tooltip]');
+      const target = e.target.closest('[data-tooltip], [data-i18n-tooltip]');
       if (target && this.appTooltip) {
         this.appTooltip.classList.remove('visible');
       }

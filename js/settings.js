@@ -28,6 +28,7 @@ class SettingsManager {
 
     this.langTrBtn = document.getElementById('langTrBtn');
     this.langEnBtn = document.getElementById('langEnBtn');
+    this.clockFormatSelect = document.getElementById('clockFormatSelect');
     this.defaultModeSelect = document.getElementById('defaultModeSelect');
 
     this.exportExcelBtn = document.getElementById('exportExcelBtn');
@@ -41,11 +42,27 @@ class SettingsManager {
   init() {
     this.applyInitialSettings();
     this.bindEvents();
+
+    if (window.I18n) {
+      window.I18n.onLanguageChange((lang) => {
+        this.appLang = lang;
+        if (lang === 'tr') {
+          if (this.langTrBtn) this.langTrBtn.classList.add('active');
+          if (this.langEnBtn) this.langEnBtn.classList.remove('active');
+        } else {
+          if (this.langEnBtn) this.langEnBtn.classList.add('active');
+          if (this.langTrBtn) this.langTrBtn.classList.remove('active');
+        }
+      });
+    }
   }
 
   applyInitialSettings() {
     if (this.defaultModeSelect) {
       this.defaultModeSelect.value = this.defaultMode;
+    }
+    if (this.clockFormatSelect && this.app) {
+      this.clockFormatSelect.value = this.app.clockFormat || '24h';
     }
     if (this.appLang === 'en') {
       if (this.langEnBtn) this.langEnBtn.classList.add('active');
@@ -89,6 +106,13 @@ class SettingsManager {
     if (this.langEnBtn) {
       this.langEnBtn.addEventListener('click', () => this.setAppLanguage('en'));
     }
+    if (this.clockFormatSelect) {
+      this.clockFormatSelect.addEventListener('change', (e) => {
+        if (this.app) {
+          this.app.setClockFormat(e.target.value);
+        }
+      });
+    }
     if (this.defaultModeSelect) {
       this.defaultModeSelect.addEventListener('change', (e) => this.setDefaultMode(e.target.value));
     }
@@ -117,6 +141,9 @@ class SettingsManager {
     if (this.settingsModalBackdrop) {
       this.settingsModalBackdrop.classList.remove('hidden');
       if (this.keybinds) this.keybinds.renderShortcutsGrid();
+      if (this.clockFormatSelect && this.app) {
+        this.clockFormatSelect.value = this.app.clockFormat || '24h';
+      }
       this.switchSettingsTab(this.activeSettingsTab || 'shortcuts');
     }
   }
@@ -154,22 +181,37 @@ class SettingsManager {
 
   setAppLanguage(lang) {
     this.appLang = lang;
-    localStorage.setItem('fliqlo_lang', lang);
+    if (window.I18n) {
+      window.I18n.setLanguage(lang);
+    } else {
+      localStorage.setItem('fliqlo_lang', lang);
+    }
+
     if (lang === 'tr') {
       if (this.langTrBtn) this.langTrBtn.classList.add('active');
       if (this.langEnBtn) this.langEnBtn.classList.remove('active');
-      if (this.ui) this.ui.showToast('Uygulama dili Türkçe olarak seçildi 🇹🇷', '🌍');
     } else {
       if (this.langEnBtn) this.langEnBtn.classList.add('active');
       if (this.langTrBtn) this.langTrBtn.classList.remove('active');
-      if (this.ui) this.ui.showToast('Language set to English 🇬🇧 (Ready for translation)', '🌍');
+    }
+
+    const toastMsg = window.I18n ? window.I18n.get('toast_lang_switched') : (lang === 'tr' ? 'Uygulama dili Türkçe olarak seçildi 🇹🇷' : 'Language set to English 🇬🇧');
+    if (this.ui) this.ui.showToast(toastMsg, '🌍');
+
+    if (this.keybinds) this.keybinds.renderShortcutsGrid();
+    if (this.app) {
+      this.app.updateClockFormatBtnUI();
+      if (this.app.mode === 'clock') {
+        this.app.tickClock(true);
+      }
     }
   }
 
   setDefaultMode(mode) {
     this.defaultMode = mode;
     localStorage.setItem('fliqlo_default_mode', mode);
-    if (this.ui) this.ui.showToast(`Varsayılan başlangıç modu güncellendi: ${mode.toUpperCase()}`, '⚙️');
+    const prefix = window.I18n ? window.I18n.get('toast_default_mode') : 'Varsayılan başlangıç modu güncellendi: ';
+    if (this.ui) this.ui.showToast(`${prefix}${mode.toUpperCase()}`, '⚙️');
   }
 
   async ensureSheetJSLoaded() {

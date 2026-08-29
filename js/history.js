@@ -58,6 +58,15 @@ class HistoryManager {
   init() {
     this.updateSessionBadge();
     this.bindEvents();
+
+    if (window.I18n) {
+      window.I18n.onLanguageChange(() => {
+        this.renderSavedList();
+        if (this.activeTab === 'compare') {
+          this.renderComparison();
+        }
+      });
+    }
   }
 
   bindEvents() {
@@ -311,19 +320,24 @@ class HistoryManager {
 
   async deleteSession(id) {
     const session = this.storage.getAll().find(s => s.id === id);
-    const sessionName = session && session.name ? session.name : 'Bu oturum';
+    const sessionName = session && session.name ? session.name : (window.I18n ? window.I18n.get('delete_modal_title') : 'Bu oturum');
     
     let confirmed = false;
+    const title = window.I18n ? window.I18n.get('delete_modal_title') : 'Oturumu Sil';
+    const message = window.I18n ? window.I18n.get('delete_modal_msg') : `"${sessionName}" adlı oturum kaydını kalıcı olarak silmek istediğinize emin misiniz?`;
+    const confirmText = window.I18n ? window.I18n.get('btn_confirm_delete') : 'Evet, Sil';
+    const cancelText = window.I18n ? window.I18n.get('btn_cancel') : 'Vazgeç';
+
     if (this.ui && typeof this.ui.confirmDialog === 'function') {
       confirmed = await this.ui.confirmDialog({
-        title: 'Oturumu Sil',
-        message: `"${sessionName}" adlı oturum kaydını kalıcı olarak silmek istediğinize emin misiniz?`,
-        confirmText: 'Evet, Sil',
-        cancelText: 'Vazgeç',
+        title,
+        message,
+        confirmText,
+        cancelText,
         icon: 'trash'
       });
     } else {
-      confirmed = window.confirm(`"${sessionName}" adlı oturum kaydını silmek istediğinize emin misiniz?`);
+      confirmed = window.confirm(message);
     }
 
     if (!confirmed) return;
@@ -333,7 +347,7 @@ class HistoryManager {
     this.saveSelection();
     this.updateSessionBadge();
     this.renderSavedList();
-    if (this.ui) this.ui.showToast('Oturum kaydı silindi', '🗑️');
+    if (this.ui) this.ui.showToast(window.I18n ? window.I18n.get('toast_session_deleted') : 'Oturum kaydı silindi 🗑️', '🗑️');
   }
 
   toggleSelectSession(id) {
@@ -382,17 +396,19 @@ class HistoryManager {
 
     if (filtered.length === 0) {
       if (this.selectAllToggleBtn) this.selectAllToggleBtn.style.display = 'none';
-      const typeText = this.historyFilter === 'stopwatch' ? 'Kronometre' : 'Geri Sayım';
+      const noTitle = window.I18n ? window.I18n.get('no_sessions_title') : 'Henüz kayıtlı oturum bulunmuyor.';
+      const noSub = window.I18n ? window.I18n.get('no_sessions_sub') : '';
       this.savedSessionsList.innerHTML = `
         <div class="empty-state">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
           </svg>
-          <p>Henüz kaydedilmiş ${typeText} oturumu bulunmuyor.</p>
+          <p style="font-weight:600; font-size:1.05rem;">${noTitle}</p>
+          <p style="color:var(--text-muted, #94a3b8); font-size:0.85rem; margin-top:4px;">${noSub}</p>
         </div>
       `;
       this.launchCompareBtn.disabled = true;
-      this.selectionStatus.textContent = '0 oturum seçildi';
+      this.selectionStatus.textContent = window.I18n ? window.I18n.get('compare_select_hint') : '0 oturum seçildi';
       return;
     }
 
@@ -407,14 +423,18 @@ class HistoryManager {
       this.selectAllCheckbox.indeterminate = someSelected;
     }
     if (this.selectAllLabel) {
-      this.selectAllLabel.textContent = allSelected ? 'Seçimi Kaldır' : 'Tümünü Seç';
+      this.selectAllLabel.textContent = allSelected 
+        ? (window.I18n ? window.I18n.get('btn_deselect_all') : 'Seçimi Kaldır')
+        : (window.I18n ? window.I18n.get('btn_select_all') : 'Tümünü Seç');
     }
 
     const selectedCount = this.selectedSessionIds.size;
     this.launchCompareBtn.disabled = selectedCount < 2;
     this.selectionStatus.textContent = selectedCount >= 2 
-      ? `${selectedCount} oturum seçildi (Kıyaslamaya hazır)`
-      : `${selectedCount} oturum seçildi (Kıyaslamak için en az 2 ${this.historyFilter === 'stopwatch' ? 'kronometre' : 'geri sayım'} oturumu seçin)`;
+      ? `${selectedCount} ${window.I18n ? window.I18n.get('tab_history_sessions') : 'oturum'} (${window.I18n ? window.I18n.get('btn_compare_selected') : 'Kıyaslamaya hazır'})`
+      : (window.I18n ? window.I18n.get('compare_select_hint') : 'Kıyaslamak için en az 2 oturum seçin');
+
+    const lapText = window.I18n ? window.I18n.get('lap_singular') : 'Tur';
 
     this.savedSessionsList.innerHTML = filtered.map(session => {
       const isSelected = this.selectedSessionIds.has(session.id);
@@ -425,10 +445,10 @@ class HistoryManager {
 
       if (session.type === 'stopwatch') {
         timeDisplay = FliqloUtils.formatTime(session.totalMs);
-        subLabel = `${session.laps.length} Tur`;
+        subLabel = `${session.laps.length} ${lapText}`;
       } else {
-        timeDisplay = `${FliqloUtils.formatTime(session.remainingMs)} kala`;
-        subLabel = `Hedef: ${FliqloUtils.formatTimeHMS(session.targetDurationMs)} (${session.laps.length} Ara Kayıt)`;
+        timeDisplay = `${FliqloUtils.formatTime(session.remainingMs)}`;
+        subLabel = `${session.laps.length} ${lapText}`;
       }
 
       return `
@@ -447,11 +467,11 @@ class HistoryManager {
               <span class="session-lap-count">${subLabel}</span>
               <div class="session-actions">
                 ${hasLaps ? `
-                  <button class="session-btn-icon" title="Detayları Göster/Gizle" data-action="expand" data-id="${session.id}">
+                  <button class="session-btn-icon" title="Detaylar" data-action="expand" data-id="${session.id}">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none;"><polyline points="6 9 12 15 18 9"></polyline></svg>
                   </button>
                 ` : ''}
-                <button class="session-btn-icon delete" title="Sil" data-action="delete" data-id="${session.id}">
+                <button class="session-btn-icon delete" title="${window.I18n ? window.I18n.get('btn_delete_session') : 'Sil'}" data-action="delete" data-id="${session.id}">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none;"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                 </button>
               </div>
@@ -465,7 +485,7 @@ class HistoryManager {
                   return `
                     <div class="session-lap-row ${l.split === session.bestLapMs ? 'best' : ''}">
                       <span style="display:inline-flex; align-items:center; gap:6px;">
-                        <span>Tur #${String(l.index).padStart(2, '0')}</span>
+                        <span>${lapText} #${String(l.index).padStart(2, '0')}</span>
                         ${l.name ? `<em style="color:#60a5fa; font-style:normal; font-size:0.8rem; font-weight:600;">(${l.name})</em>` : ''}
                       </span>
                       <span>+${FliqloUtils.formatTime(l.split)}</span>
@@ -476,11 +496,11 @@ class HistoryManager {
                   return `
                     <div class="session-lap-row">
                       <span style="display:inline-flex; align-items:center; gap:6px;">
-                        <span>Ara Kayıt #${String(l.index).padStart(2, '0')}</span>
+                        <span>${lapText} #${String(l.index).padStart(2, '0')}</span>
                         ${l.name ? `<em style="color:#60a5fa; font-style:normal; font-size:0.8rem; font-weight:600;">(${l.name})</em>` : ''}
                       </span>
-                      <span>+${FliqloUtils.formatTime(l.split)} fark</span>
-                      <span style="color:#22c55e;">${FliqloUtils.formatTime(l.remaining)} kala</span>
+                      <span>+${FliqloUtils.formatTime(l.split)}</span>
+                      <span style="color:#22c55e;">${FliqloUtils.formatTime(l.remaining)}</span>
                     </div>
                   `;
                 }

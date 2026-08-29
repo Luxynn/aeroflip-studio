@@ -157,6 +157,10 @@ class FlipStopwatchApp {
     this.updateSoundBtnUI();
     this.updateAmbienceUI();
 
+    if (window.I18n) {
+      window.I18n.onLanguageChange((lang) => this.onLanguageChanged(lang));
+    }
+
     // Restore saved timer custom preset
     const savedH = localStorage.getItem('aeroflip_timer_h');
     const savedM = localStorage.getItem('aeroflip_timer_m');
@@ -168,6 +172,40 @@ class FlipStopwatchApp {
     // Default mode setup
     const defMode = localStorage.getItem('fliqlo_default_mode') || 'stopwatch';
     this.switchMode(defMode);
+  }
+
+  onLanguageChanged(lang) {
+    this.updateClockFormatBtnUI();
+    if (this.mode === 'clock') {
+      this.tickClock(true);
+    } else {
+      this.updateControlsUI();
+    }
+  }
+
+  updateControlsUI() {
+    if (!this.startPauseText) return;
+    if (this.isRunning) {
+      this.startPauseText.textContent = window.I18n ? window.I18n.get('btn_pause') : 'Durdur';
+    } else if (this.elapsedTime > 0 || (this.mode === 'timer' && this.timerRemainingMs < this.timerDurationMs)) {
+      this.startPauseText.textContent = window.I18n ? window.I18n.get('btn_resume') : 'Devam';
+    } else {
+      this.startPauseText.textContent = window.I18n ? window.I18n.get('btn_start') : 'Başlat';
+    }
+
+    if (this.lapBtnText) {
+      this.lapBtnText.textContent = window.I18n ? window.I18n.get('btn_lap') : 'Tur';
+    }
+
+    if (this.lapsHeaderSplit && this.lapsHeaderTotal) {
+      if (this.mode === 'stopwatch') {
+        this.lapsHeaderSplit.textContent = window.I18n ? window.I18n.get('laps_header_split') : 'TUR ZAMANI';
+        this.lapsHeaderTotal.textContent = window.I18n ? window.I18n.get('laps_header_total') : 'TOPLAM SÜRE';
+      } else {
+        this.lapsHeaderSplit.textContent = window.I18n ? window.I18n.get('pill_diff') : 'FARK';
+        this.lapsHeaderTotal.textContent = window.I18n ? window.I18n.get('laps_header_total') : 'KALAN SÜRE';
+      }
+    }
   }
 
   /* ============================================================
@@ -209,11 +247,11 @@ class FlipStopwatchApp {
       if (this.clockControlsGroup) this.clockControlsGroup.classList.add('hidden');
       if (this.clockInfoBanner) this.clockInfoBanner.classList.add('hidden');
       if (this.taskGoalBar) this.taskGoalBar.classList.remove('hidden');
-      if (this.msLabel) this.msLabel.textContent = 'MS';
+      if (this.msLabel) this.msLabel.textContent = window.I18n ? window.I18n.get('pill_ms') : 'MS';
       if (this.msDisplay) this.msDisplay.textContent = '.00';
-      this.lapBtnText.textContent = 'Tur';
-      this.lapsHeaderSplit.textContent = 'TUR FARKI';
-      this.lapsHeaderTotal.textContent = 'TOPLAM SÜRE';
+      if (this.lapBtnText) this.lapBtnText.textContent = window.I18n ? window.I18n.get('btn_lap') : 'Tur';
+      if (this.lapsHeaderSplit) this.lapsHeaderSplit.textContent = window.I18n ? window.I18n.get('laps_header_split') : 'TUR ZAMANI';
+      if (this.lapsHeaderTotal) this.lapsHeaderTotal.textContent = window.I18n ? window.I18n.get('laps_header_total') : 'TOPLAM SÜRE';
       this.cards.setAllInstant('00', '00', '00');
     } else {
       if (this.modeTimerBtn) this.modeTimerBtn.classList.add('active');
@@ -224,11 +262,11 @@ class FlipStopwatchApp {
       if (this.clockControlsGroup) this.clockControlsGroup.classList.add('hidden');
       if (this.clockInfoBanner) this.clockInfoBanner.classList.add('hidden');
       if (this.taskGoalBar) this.taskGoalBar.classList.remove('hidden');
-      if (this.msLabel) this.msLabel.textContent = 'GEÇEN';
+      if (this.msLabel) this.msLabel.textContent = window.I18n ? window.I18n.get('pill_elapsed') : 'GEÇEN';
       if (this.msDisplay) this.msDisplay.textContent = '00:00:00';
-      this.lapBtnText.textContent = 'Ara Kayıt';
-      this.lapsHeaderSplit.textContent = 'FARK';
-      this.lapsHeaderTotal.textContent = 'KALAN SÜRE';
+      if (this.lapBtnText) this.lapBtnText.textContent = window.I18n ? window.I18n.get('btn_lap') : 'Tur';
+      if (this.lapsHeaderSplit) this.lapsHeaderSplit.textContent = window.I18n ? window.I18n.get('pill_diff') : 'FARK';
+      if (this.lapsHeaderTotal) this.lapsHeaderTotal.textContent = window.I18n ? window.I18n.get('laps_header_total') : 'KALAN SÜRE';
       this.syncTimerFromInputs();
     }
   }
@@ -247,19 +285,37 @@ class FlipStopwatchApp {
     }
   }
 
-  toggleClockFormat() {
-    this.clockFormat = this.clockFormat === '24h' ? '12h' : '24h';
+  setClockFormat(format) {
+    if (format !== '24h' && format !== '12h') format = '24h';
+    this.clockFormat = format;
     localStorage.setItem('fliqlo_clock_format', this.clockFormat);
     this.updateClockFormatBtnUI();
-    if (this.ui) this.ui.showToast(this.clockFormat === '24h' ? '24 Saat Formatı Aktif' : '12 Saat Formatı (AM/PM) Aktif', '🕒');
+    const toastMsg = this.clockFormat === '24h'
+      ? (window.I18n ? window.I18n.get('toast_format_24h') : '24 Saat Formatı Aktif 🕒')
+      : (window.I18n ? window.I18n.get('toast_format_12h') : '12 Saat Formatı (AM/PM) Aktif 🕒');
+    if (this.ui) this.ui.showToast(toastMsg, '🕒');
     if (this.mode === 'clock') {
       this.tickClock(true);
     }
   }
 
+  toggleClockFormat() {
+    this.setClockFormat(this.clockFormat === '24h' ? '12h' : '24h');
+  }
+
   updateClockFormatBtnUI() {
+    const is24h = this.clockFormat === '24h';
+    const text = is24h
+      ? (window.I18n ? window.I18n.get('format_24h_btn') : '24 Saat Formatı')
+      : (window.I18n ? window.I18n.get('format_12h_btn') : '12 Saat (AM/PM)');
+
     if (this.clockFormatText) {
-      this.clockFormatText.textContent = this.clockFormat === '24h' ? '24 Saat Formatı' : '12 Saat (AM/PM)';
+      this.clockFormatText.textContent = text;
+    }
+
+    const select = document.getElementById('clockFormatSelect');
+    if (select && select.value !== this.clockFormat) {
+      select.value = this.clockFormat;
     }
   }
 
@@ -289,19 +345,18 @@ class FlipStopwatchApp {
     // Update Date text
     if (this.clockDateText) {
       const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-      this.clockDateText.textContent = now.toLocaleDateString('tr-TR', options);
+      const locale = (window.I18n && window.I18n.currentLang === 'en') ? 'en-US' : 'tr-TR';
+      this.clockDateText.textContent = now.toLocaleDateString(locale, options);
     }
 
     // Update Browser Tab Title in Clock Mode
     document.title = `🕒 ${hStr}:${mStr} | AeroFlip Studio`;
 
     // Update Pill
-    if (this.clockFormat === '12h') {
-      if (this.msLabel) this.msLabel.textContent = 'DÖNEM';
-      if (this.msDisplay) this.msDisplay.textContent = ampm;
-    } else {
-      if (this.msLabel) this.msLabel.textContent = 'MOD';
-      if (this.msDisplay) this.msDisplay.textContent = '24H';
+    const formatLabel = window.I18n ? window.I18n.get('pill_format') : 'FORMAT';
+    if (this.msLabel) this.msLabel.textContent = formatLabel;
+    if (this.msDisplay) {
+      this.msDisplay.textContent = this.clockFormat === '12h' ? ampm : '24H';
     }
   }
 
@@ -484,12 +539,12 @@ class FlipStopwatchApp {
     cancelAnimationFrame(this.timerId);
     if (this.worker) this.worker.postMessage('stop');
     this.timerRemainingMs = 0;
-    document.title = '🔔 SÜRE DOLDU! | AeroFlip Studio';
+    document.title = (window.I18n && window.I18n.currentLang === 'en') ? '🔔 TIME\'S UP! | AeroFlip Studio' : '🔔 SÜRE DOLDU! | AeroFlip Studio';
 
     this.startPauseBtn.classList.remove('is-running');
     this.startPauseBtn.querySelector('.icon-play').classList.remove('hidden');
     this.startPauseBtn.querySelector('.icon-pause').classList.add('hidden');
-    this.startPauseText.textContent = 'Başlat';
+    this.startPauseText.textContent = window.I18n ? window.I18n.get('btn_start') : 'Başlat';
 
     this.saveSessionBtn.disabled = false;
     this.startAlarm();
@@ -525,7 +580,7 @@ class FlipStopwatchApp {
     this.startPauseBtn.classList.add('is-running');
     this.startPauseBtn.querySelector('.icon-play').classList.add('hidden');
     this.startPauseBtn.querySelector('.icon-pause').classList.remove('hidden');
-    this.startPauseText.textContent = 'Durdur';
+    this.startPauseText.textContent = window.I18n ? window.I18n.get('btn_pause') : 'Durdur';
 
     this.resetBtn.disabled = false;
     this.lapBtn.disabled = false;
@@ -550,7 +605,7 @@ class FlipStopwatchApp {
     this.startPauseBtn.classList.remove('is-running');
     this.startPauseBtn.querySelector('.icon-play').classList.remove('hidden');
     this.startPauseBtn.querySelector('.icon-pause').classList.add('hidden');
-    this.startPauseText.textContent = 'Devam';
+    this.startPauseText.textContent = window.I18n ? window.I18n.get('btn_resume') : 'Devam';
 
     this.saveSessionBtn.disabled = false;
   }
@@ -575,7 +630,7 @@ class FlipStopwatchApp {
     this.startPauseBtn.classList.remove('is-running');
     this.startPauseBtn.querySelector('.icon-play').classList.remove('hidden');
     this.startPauseBtn.querySelector('.icon-pause').classList.add('hidden');
-    this.startPauseText.textContent = 'Başlat';
+    this.startPauseText.textContent = window.I18n ? window.I18n.get('btn_start') : 'Başlat';
 
     this.resetBtn.disabled = true;
     this.lapBtn.disabled = true;
@@ -589,12 +644,12 @@ class FlipStopwatchApp {
       this.timerSetupPanel.classList.remove('hidden');
       this.fliqloStage.classList.add('hidden');
       this.fliqloControlsBar.classList.add('hidden');
-      if (this.msLabel) this.msLabel.textContent = 'GEÇEN';
+      if (this.msLabel) this.msLabel.textContent = window.I18n ? window.I18n.get('pill_elapsed') : 'GEÇEN';
       if (this.msDisplay) this.msDisplay.textContent = '00:00:00';
       this.syncTimerFromInputs();
     } else if (this.mode === 'stopwatch') {
       this.cards.setAllInstant('00', '00', '00');
-      if (this.msLabel) this.msLabel.textContent = 'MS';
+      if (this.msLabel) this.msLabel.textContent = window.I18n ? window.I18n.get('pill_ms') : 'MS';
       if (this.msDisplay) this.msDisplay.textContent = '.00';
     }
   }

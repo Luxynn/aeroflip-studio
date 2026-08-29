@@ -5,12 +5,57 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AeroFlip Studio | Minimalist Flip Clock & Stopwatch</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <!-- High Priority Font Connections & Preload -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- AeroFlip Studio: Time-Morph Splash & Progressive Entry Portal -->
+  <div class="app-splash-screen" id="appSplashScreen" tabindex="0" role="dialog" aria-modal="true" aria-label="AeroFlip Studio Giriş Portalı">
+    <div class="splash-bg-glow"></div>
+    
+    <div class="splash-content-box">
+      <!-- 3D Time-Morph Card Stage -->
+      <div class="splash-stage-3d" id="splashStage3D">
+        <div class="splash-flip-card side-card side-left" id="splashCardHours">
+          <div class="splash-card-inner" id="splashHoursVal">12</div>
+        </div>
+        <div class="splash-colon" id="splashColon1">:</div>
+        <div class="splash-flip-card center-unit" id="splashCardCenter">
+          <div class="splash-card-inner" id="splashCenterVal">
+            <span class="splash-logo-icon">
+              <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+                <path d="M12 2v2"></path>
+              </svg>
+            </span>
+          </div>
+        </div>
+        <div class="splash-colon" id="splashColon2">:</div>
+        <div class="splash-flip-card side-card side-right" id="splashCardSeconds">
+          <div class="splash-card-inner" id="splashSecondsVal">00</div>
+        </div>
+      </div>
+
+      <!-- Branding -->
+      <div class="splash-brand-title">
+        <h1 class="splash-title-text">AeroFlip Studio</h1>
+        <span class="splash-subtitle">3D Mekanik Flip Saat & Odak İstasyonu</span>
+      </div>
+
+      <!-- Time Stream Progress Bar -->
+      <div class="splash-stream-wrap">
+        <div class="splash-stream-track">
+          <div class="splash-stream-fill" id="splashStreamFill"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Atmospheric Rainy Glass Canvas Background -->
   <div class="rain-bg-backdrop" id="rainBackdrop">
     <canvas id="rainCanvas" class="rain-canvas"></canvas>
@@ -529,9 +574,6 @@
   <!-- Hidden File Input for JSON Backup Restore -->
   <input type="file" id="importFileInput" accept=".json" style="display: none;">
 
-  <!-- External SheetJS (.xlsx Engine) -->
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-
   <!-- Modular Zero-Server Scripts -->
   <script src="js/utils.js"></script>
   <script src="js/audio.js"></script>
@@ -543,6 +585,7 @@
   <script src="js/keybinds.js"></script>
   <script src="js/settings.js"></script>
   <script src="js/history.js"></script>
+  <script src="js/splash.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

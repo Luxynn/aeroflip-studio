@@ -172,10 +172,36 @@ class SettingsManager {
     if (this.ui) this.ui.showToast(`Varsayılan başlangıç modu güncellendi: ${mode.toUpperCase()}`, '⚙️');
   }
 
-  exportExcelData() {
+  async ensureSheetJSLoaded() {
+    if (typeof XLSX !== 'undefined') return true;
+    if (this._sheetJSLoadingPromise) return this._sheetJSLoadingPromise;
+
+    this._sheetJSLoadingPromise = new Promise((resolve) => {
+      if (this.ui) this.ui.showToast('Excel motoru hazırlanıyor...', '⏳');
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+      script.async = true;
+      script.onload = () => {
+        resolve(true);
+      };
+      script.onerror = () => {
+        console.warn('Failed to dynamically load SheetJS');
+        if (this.ui) this.ui.showToast('Excel motoru indirilemedi', '⚠️');
+        resolve(false);
+      };
+      document.body.appendChild(script);
+    });
+
+    return this._sheetJSLoadingPromise;
+  }
+
+  async exportExcelData() {
     if (typeof XLSX === 'undefined') {
-      if (this.ui) this.ui.showToast('SheetJS Excel motoru yüklenemedi', '⚠️');
-      return;
+      const loaded = await this.ensureSheetJSLoaded();
+      if (!loaded || typeof XLSX === 'undefined') {
+        if (this.ui) this.ui.showToast('SheetJS Excel motoru yüklenemedi', '⚠️');
+        return;
+      }
     }
 
     const data = this.storage.getAll();

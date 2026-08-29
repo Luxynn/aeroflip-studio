@@ -57,6 +57,14 @@ class FlipStopwatchApp {
     this.settings = new SettingsManager(this, this.storage, this.ui, this.keybinds);
     this.history = new HistoryManager(this, this.storage, this.analytics, this.ui);
 
+    // Time-Morph Splash & Progressive Entrance
+    this.splash = new SplashManager(() => {
+      if (this.audio) {
+        this.audio.ensureAudioRunning();
+        this.audio.playMechanicalClick();
+      }
+    });
+
     this.init();
   }
 

@@ -8,14 +8,31 @@ class FlipStopwatchApp {
     // Mode: 'clock' | 'stopwatch' | 'timer'
     this.mode = 'stopwatch';
 
-    // Core State
-    this.startTime = 0;
-    this.elapsedTime = 0;
+    // Stopwatch State (Independent from timer)
+    this.stopwatch = {
+      isRunning: false,
+      startTime: 0,
+      elapsedTime: 0,
+      laps: [],
+      lastLapTime: 0
+    };
+
+    // Timer / Countdown State (Independent from stopwatch)
+    this.timer = {
+      isRunning: false,
+      isStarted: false,
+      startTime: 0,
+      timerDurationMs: DEFAULT_TIMER_DURATION_MS,
+      timerRemainingMs: DEFAULT_TIMER_DURATION_MS,
+      timerInitialSetSec: 300,
+      laps: [],
+      lastLapTime: 0,
+      isFinished: false
+    };
+
+    // Common Animation & Loop State
     this.timerId = null;
-    this.isRunning = false;
     this.rainEnabled = true;
-    this.laps = [];
-    this.lastLapTime = 0;
     this.lastMsDomUpdate = 0;
     this.lastTimerFrameTime = 0;
     this.lastTitleSec = -1;
@@ -23,11 +40,6 @@ class FlipStopwatchApp {
     // Clock Mode State
     this.clockInterval = null;
     this.clockFormat = localStorage.getItem('fliqlo_clock_format') || '24h'; // '24h' | '12h'
-
-    // Timer State
-    this.timerDurationMs = DEFAULT_TIMER_DURATION_MS;
-    this.timerRemainingMs = DEFAULT_TIMER_DURATION_MS;
-    this.timerInitialSetSec = 300;
     this.alarmInterval = null;
 
     // Web Worker Background Ticker
@@ -68,6 +80,81 @@ class FlipStopwatchApp {
     this.init();
   }
 
+  /* ============================================================
+     BACKWARD COMPATIBILITY GETTERS & SETTERS
+     ============================================================ */
+  get isRunning() {
+    if (this.mode === 'stopwatch') return this.stopwatch.isRunning;
+    if (this.mode === 'timer') return this.timer.isRunning;
+    return false;
+  }
+  set isRunning(val) {
+    if (this.mode === 'stopwatch') this.stopwatch.isRunning = val;
+    else if (this.mode === 'timer') this.timer.isRunning = val;
+  }
+
+  get elapsedTime() {
+    if (this.stopwatch.isRunning) {
+      return this.stopwatch.elapsedTime + (performance.now() - this.stopwatch.startTime);
+    }
+    return this.stopwatch.elapsedTime;
+  }
+  set elapsedTime(val) {
+    this.stopwatch.elapsedTime = val;
+  }
+
+  get startTime() {
+    if (this.mode === 'stopwatch') return this.stopwatch.startTime;
+    if (this.mode === 'timer') return this.timer.startTime;
+    return 0;
+  }
+  set startTime(val) {
+    if (this.mode === 'stopwatch') this.stopwatch.startTime = val;
+    else if (this.mode === 'timer') this.timer.startTime = val;
+  }
+
+  get laps() {
+    if (this.mode === 'timer') return this.timer.laps;
+    return this.stopwatch.laps;
+  }
+  set laps(val) {
+    if (this.mode === 'timer') this.timer.laps = val;
+    else this.stopwatch.laps = val;
+  }
+
+  get lastLapTime() {
+    if (this.mode === 'timer') return this.timer.lastLapTime;
+    return this.stopwatch.lastLapTime;
+  }
+  set lastLapTime(val) {
+    if (this.mode === 'timer') this.timer.lastLapTime = val;
+    else this.stopwatch.lastLapTime = val;
+  }
+
+  get timerDurationMs() {
+    return this.timer.timerDurationMs;
+  }
+  set timerDurationMs(val) {
+    this.timer.timerDurationMs = val;
+  }
+
+  get timerRemainingMs() {
+    if (this.timer.isRunning) {
+      return Math.max(0, this.timer.timerRemainingMs - (performance.now() - this.timer.startTime));
+    }
+    return this.timer.timerRemainingMs;
+  }
+  set timerRemainingMs(val) {
+    this.timer.timerRemainingMs = val;
+  }
+
+  get timerInitialSetSec() {
+    return this.timer.timerInitialSetSec;
+  }
+  set timerInitialSetSec(val) {
+    this.timer.timerInitialSetSec = val;
+  }
+
   initWorker() {
     try {
       const workerCode = `
@@ -90,7 +177,7 @@ class FlipStopwatchApp {
       const blob = new Blob([workerCode], { type: 'application/javascript' });
       this.worker = new Worker(URL.createObjectURL(blob));
       this.worker.onmessage = (e) => {
-        if (e.data === 'tick' && this.isRunning) {
+        if (e.data === 'tick' && (this.stopwatch.isRunning || this.timer.isRunning)) {
           this.onWorkerTick();
         }
       };
@@ -185,12 +272,53 @@ class FlipStopwatchApp {
 
   updateControlsUI() {
     if (!this.startPauseText) return;
-    if (this.isRunning) {
+    const isRunning = this.isRunning;
+    const isTimer = this.mode === 'timer';
+
+    if (isRunning) {
+      this.startPauseBtn.classList.add('is-running');
+      this.startPauseBtn.querySelector('.icon-play').classList.add('hidden');
+      this.startPauseBtn.querySelector('.icon-pause').classList.remove('hidden');
       this.startPauseText.textContent = window.I18n ? window.I18n.get('btn_pause') : 'Durdur';
-    } else if (this.elapsedTime > 0 || (this.mode === 'timer' && this.timerRemainingMs < this.timerDurationMs)) {
-      this.startPauseText.textContent = window.I18n ? window.I18n.get('btn_resume') : 'Devam';
+      this.resetBtn.disabled = false;
+      this.lapBtn.disabled = false;
+      this.saveSessionBtn.disabled = true;
     } else {
-      this.startPauseText.textContent = window.I18n ? window.I18n.get('btn_start') : 'Başlat';
+      this.startPauseBtn.classList.remove('is-running');
+      this.startPauseBtn.querySelector('.icon-play').classList.remove('hidden');
+      this.startPauseBtn.querySelector('.icon-pause').classList.add('hidden');
+
+      if (isTimer) {
+        if (this.timer.isFinished) {
+          this.startPauseText.textContent = window.I18n ? window.I18n.get('btn_start') : 'Başlat';
+          this.resetBtn.disabled = false;
+          this.lapBtn.disabled = true;
+          this.saveSessionBtn.disabled = false;
+        } else if (this.timer.isStarted && this.timerRemainingMs < this.timer.timerDurationMs) {
+          this.startPauseText.textContent = window.I18n ? window.I18n.get('btn_resume') : 'Devam';
+          this.resetBtn.disabled = false;
+          this.lapBtn.disabled = true;
+          this.saveSessionBtn.disabled = false;
+        } else {
+          this.startPauseText.textContent = window.I18n ? window.I18n.get('btn_start') : 'Başlat';
+          this.resetBtn.disabled = true;
+          this.lapBtn.disabled = true;
+          this.saveSessionBtn.disabled = true;
+        }
+      } else {
+        // Stopwatch
+        if (this.stopwatch.elapsedTime > 0) {
+          this.startPauseText.textContent = window.I18n ? window.I18n.get('btn_resume') : 'Devam';
+          this.resetBtn.disabled = false;
+          this.lapBtn.disabled = true;
+          this.saveSessionBtn.disabled = false;
+        } else {
+          this.startPauseText.textContent = window.I18n ? window.I18n.get('btn_start') : 'Başlat';
+          this.resetBtn.disabled = true;
+          this.lapBtn.disabled = true;
+          this.saveSessionBtn.disabled = true;
+        }
+      }
     }
 
     if (this.lapBtnText) {
@@ -214,10 +342,9 @@ class FlipStopwatchApp {
   switchMode(newMode) {
     if (this.mode === newMode) return;
 
-    if (this.mode === 'clock') {
+    const prevMode = this.mode;
+    if (prevMode === 'clock') {
       this.stopClock();
-    } else {
-      this.reset();
     }
 
     this.mode = newMode;
@@ -247,27 +374,74 @@ class FlipStopwatchApp {
       if (this.clockControlsGroup) this.clockControlsGroup.classList.add('hidden');
       if (this.clockInfoBanner) this.clockInfoBanner.classList.add('hidden');
       if (this.taskGoalBar) this.taskGoalBar.classList.remove('hidden');
+
+      const now = performance.now();
+      const currentElapsed = this.stopwatch.elapsedTime + (this.stopwatch.isRunning ? (now - this.stopwatch.startTime) : 0);
+      const totalSeconds = Math.floor(currentElapsed / 1000);
+      const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+      const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+      const seconds = String(totalSeconds % 60).padStart(2, '0');
+      const ms = Math.floor((currentElapsed % 1000) / 10);
+
+      this.cards.setAllInstant(hours, minutes, seconds);
       if (this.msLabel) this.msLabel.textContent = window.I18n ? window.I18n.get('pill_ms') : 'MS';
-      if (this.msDisplay) this.msDisplay.textContent = '.00';
-      if (this.lapBtnText) this.lapBtnText.textContent = window.I18n ? window.I18n.get('btn_lap') : 'Tur';
-      if (this.lapsHeaderSplit) this.lapsHeaderSplit.textContent = window.I18n ? window.I18n.get('laps_header_split') : 'TUR ZAMANI';
-      if (this.lapsHeaderTotal) this.lapsHeaderTotal.textContent = window.I18n ? window.I18n.get('laps_header_total') : 'TOPLAM SÜRE';
-      this.cards.setAllInstant('00', '00', '00');
-    } else {
+      if (this.msDisplay) this.msDisplay.textContent = '.' + String(ms).padStart(2, '0');
+
+      this.renderActiveLaps();
+      this.updateControlsUI();
+
+      if (this.stopwatch.isRunning) {
+        this.ensureRunningLoop();
+      }
+    } else if (newMode === 'timer') {
       if (this.modeTimerBtn) this.modeTimerBtn.classList.add('active');
-      this.timerSetupPanel.classList.remove('hidden');
-      this.fliqloStage.classList.add('hidden');
-      this.fliqloControlsBar.classList.add('hidden');
       if (this.timerControlsGroup) this.timerControlsGroup.classList.remove('hidden');
       if (this.clockControlsGroup) this.clockControlsGroup.classList.add('hidden');
       if (this.clockInfoBanner) this.clockInfoBanner.classList.add('hidden');
       if (this.taskGoalBar) this.taskGoalBar.classList.remove('hidden');
-      if (this.msLabel) this.msLabel.textContent = window.I18n ? window.I18n.get('pill_elapsed') : 'GEÇEN';
-      if (this.msDisplay) this.msDisplay.textContent = '00:00:00';
-      if (this.lapBtnText) this.lapBtnText.textContent = window.I18n ? window.I18n.get('btn_lap') : 'Tur';
-      if (this.lapsHeaderSplit) this.lapsHeaderSplit.textContent = window.I18n ? window.I18n.get('pill_diff') : 'FARK';
-      if (this.lapsHeaderTotal) this.lapsHeaderTotal.textContent = window.I18n ? window.I18n.get('laps_header_total') : 'KALAN SÜRE';
-      this.syncTimerFromInputs();
+
+      if (this.timer.isStarted) {
+        this.timerSetupPanel.classList.add('hidden');
+        this.fliqloStage.classList.remove('hidden');
+        this.fliqloControlsBar.classList.remove('hidden');
+
+        const now = performance.now();
+        let remaining = this.timer.timerRemainingMs;
+        if (this.timer.isRunning) {
+          remaining = Math.max(0, this.timer.timerRemainingMs - (now - this.timer.startTime));
+        }
+
+        const totalSeconds = Math.floor(remaining / 1000);
+        const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+        const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+        const seconds = String(totalSeconds % 60).padStart(2, '0');
+
+        this.cards.setAllInstant(hours, minutes, seconds);
+
+        const elapsed = Math.max(0, this.timer.timerDurationMs - remaining);
+        const elapsedHMS = FliqloUtils.formatTimeHMS(elapsed);
+        let timerPillText = elapsedHMS;
+        if (this.timer.laps && this.timer.laps.length > 0) {
+          const splitSinceLap = Math.max(0, elapsed - this.timer.lastLapTime);
+          const splitHMS = FliqloUtils.formatTimeHMS(splitSinceLap);
+          timerPillText = `${elapsedHMS} (Tur: +${splitHMS})`;
+        }
+        if (this.msLabel) this.msLabel.textContent = window.I18n ? window.I18n.get('pill_elapsed') : 'GEÇEN';
+        if (this.msDisplay) this.msDisplay.textContent = timerPillText;
+
+        this.renderActiveLaps();
+        this.updateControlsUI();
+
+        if (this.timer.isRunning) {
+          this.ensureRunningLoop();
+        }
+      } else {
+        this.timerSetupPanel.classList.remove('hidden');
+        this.fliqloStage.classList.add('hidden');
+        this.fliqloControlsBar.classList.add('hidden');
+        this.lapsContainer.classList.remove('has-laps');
+        this.syncTimerFromInputs();
+      }
     }
   }
 
@@ -381,9 +555,9 @@ class FlipStopwatchApp {
     }
 
     const totalMs = (h * 3600 + m * 60 + s) * 1000;
-    this.timerDurationMs = totalMs;
-    this.timerRemainingMs = totalMs;
-    this.timerInitialSetSec = h * 3600 + m * 60 + s;
+    this.timer.timerDurationMs = totalMs;
+    this.timer.timerRemainingMs = totalMs;
+    this.timer.timerInitialSetSec = h * 3600 + m * 60 + s;
 
     this.cards.setAllInstant(String(h).padStart(2, '0'), String(m).padStart(2, '0'), String(s).padStart(2, '0'));
     if (this.msLabel) this.msLabel.textContent = 'GEÇEN';
@@ -391,7 +565,7 @@ class FlipStopwatchApp {
   }
 
   adjustTimerInput(type, delta) {
-    if (this.isRunning) return;
+    if (this.timer.isRunning) return;
 
     let input = type === 'hour' ? this.timerInputHours : (type === 'min' ? this.timerInputMinutes : this.timerInputSeconds);
     let max = type === 'hour' ? 99 : 59;
@@ -405,7 +579,7 @@ class FlipStopwatchApp {
   }
 
   addPresetTime(secondsToAdd) {
-    if (this.isRunning) return;
+    if (this.timer.isRunning) return;
 
     const currentTotalSec = (parseInt(this.timerInputHours.value, 10) || 0) * 3600 +
                             (parseInt(this.timerInputMinutes.value, 10) || 0) * 60 +
@@ -425,7 +599,7 @@ class FlipStopwatchApp {
   }
 
   clearTimerInputs() {
-    if (this.isRunning) return;
+    if (this.timer.isRunning) return;
     this.timerInputHours.value = '00';
     this.timerInputMinutes.value = '00';
     this.timerInputSeconds.value = '00';
@@ -436,48 +610,85 @@ class FlipStopwatchApp {
      TICK & RENDER LOOP (25 FPS Throttled)
      ============================================================ */
   onWorkerTick() {
-    if (!this.isRunning || !document.hidden) return;
+    if (!document.hidden) return;
     const now = performance.now();
-    if (this.mode === 'stopwatch') {
-      const currentElapsed = this.elapsedTime + (now - this.startTime);
-      this.updateDisplay(currentElapsed);
-    } else if (this.mode === 'timer') {
-      const currentElapsed = now - this.startTime;
-      const remaining = this.timerRemainingMs - currentElapsed;
+
+    if (this.stopwatch.isRunning) {
+      const currentElapsed = this.stopwatch.elapsedTime + (now - this.stopwatch.startTime);
+      if (this.mode === 'stopwatch') {
+        this.updateDisplay(currentElapsed);
+      }
+    }
+
+    if (this.timer.isRunning) {
+      const currentElapsed = now - this.timer.startTime;
+      const remaining = this.timer.timerRemainingMs - currentElapsed;
       if (remaining <= 0) {
-        this.updateDisplay(0);
+        if (this.mode === 'timer') this.updateDisplay(0);
         this.timerFinished();
       } else {
-        this.updateDisplay(remaining);
+        if (this.mode === 'timer') this.updateDisplay(remaining);
+      }
+    }
+  }
+
+  ensureRunningLoop() {
+    if (!this.timerId) {
+      this.lastTimerFrameTime = performance.now();
+      this.timerId = requestAnimationFrame((t) => this.update(t));
+    }
+    if (document.hidden && this.worker) {
+      this.worker.postMessage('start');
+    }
+  }
+
+  checkStopRunningLoop() {
+    if (!this.stopwatch.isRunning && !this.timer.isRunning) {
+      if (this.timerId) {
+        cancelAnimationFrame(this.timerId);
+        this.timerId = null;
+      }
+      if (this.worker) {
+        this.worker.postMessage('stop');
       }
     }
   }
 
   update(timestamp = performance.now()) {
-    if (!this.isRunning) return;
+    const anyRunning = this.stopwatch.isRunning || this.timer.isRunning;
+    if (!anyRunning) {
+      this.timerId = null;
+      return;
+    }
 
     this.timerId = requestAnimationFrame((t) => this.update(t));
 
-    const elapsed = timestamp - this.lastTimerFrameTime;
-    if (elapsed < TARGET_TIMER_FRAME_INTERVAL_MS) {
+    const elapsedFrame = timestamp - this.lastTimerFrameTime;
+    if (elapsedFrame < TARGET_TIMER_FRAME_INTERVAL_MS) {
       return; // 25 FPS throttle to minimize GPU/DWM load
     }
-    this.lastTimerFrameTime = timestamp - (elapsed % TARGET_TIMER_FRAME_INTERVAL_MS);
+    this.lastTimerFrameTime = timestamp - (elapsedFrame % TARGET_TIMER_FRAME_INTERVAL_MS);
+
+    let currentStopwatchElapsed = this.stopwatch.elapsedTime;
+    if (this.stopwatch.isRunning) {
+      currentStopwatchElapsed += (timestamp - this.stopwatch.startTime);
+    }
+
+    let currentTimerRemaining = this.timer.timerRemainingMs;
+    if (this.timer.isRunning) {
+      const currentElapsed = timestamp - this.timer.startTime;
+      currentTimerRemaining = this.timer.timerRemainingMs - currentElapsed;
+
+      if (currentTimerRemaining <= 0) {
+        currentTimerRemaining = 0;
+        this.timerFinished();
+      }
+    }
 
     if (this.mode === 'stopwatch') {
-      const currentElapsed = this.elapsedTime + (timestamp - this.startTime);
-      this.updateDisplay(currentElapsed);
-    } else if (this.mode === 'timer') {
-      const currentElapsed = timestamp - this.startTime;
-      const remaining = this.timerRemainingMs - currentElapsed;
-
-      if (remaining <= 0) {
-        this.updateDisplay(0);
-        this.timerFinished();
-        return;
-      }
-
-      this.updateDisplay(remaining);
+      this.updateDisplay(currentStopwatchElapsed);
+    } else if (this.mode === 'timer' && this.timer.isStarted) {
+      this.updateDisplay(currentTimerRemaining);
     }
   }
 
@@ -496,11 +707,11 @@ class FlipStopwatchApp {
     const now = performance.now();
     if (now - this.lastMsDomUpdate >= MS_DOM_THROTTLE_INTERVAL_MS || msValue === 0) {
       if (this.mode === 'timer') {
-        const elapsed = Math.max(0, this.timerDurationMs - msValue);
+        const elapsed = Math.max(0, this.timer.timerDurationMs - msValue);
         const elapsedHMS = FliqloUtils.formatTimeHMS(elapsed);
         let timerPillText = elapsedHMS;
-        if (this.laps && this.laps.length > 0) {
-          const splitSinceLap = Math.max(0, elapsed - this.lastLapTime);
+        if (this.timer.laps && this.timer.laps.length > 0) {
+          const splitSinceLap = Math.max(0, elapsed - this.timer.lastLapTime);
           const splitHMS = FliqloUtils.formatTimeHMS(splitSinceLap);
           timerPillText = `${elapsedHMS} (Tur: +${splitHMS})`;
         }
@@ -535,18 +746,18 @@ class FlipStopwatchApp {
   }
 
   timerFinished() {
-    this.isRunning = false;
-    cancelAnimationFrame(this.timerId);
-    if (this.worker) this.worker.postMessage('stop');
-    this.timerRemainingMs = 0;
+    this.timer.isRunning = false;
+    this.timer.timerRemainingMs = 0;
+    this.timer.isFinished = true;
+    this.checkStopRunningLoop();
+
     document.title = (window.I18n && window.I18n.currentLang === 'en') ? '🔔 TIME\'S UP! | AeroFlip Studio' : '🔔 SÜRE DOLDU! | AeroFlip Studio';
 
-    this.startPauseBtn.classList.remove('is-running');
-    this.startPauseBtn.querySelector('.icon-play').classList.remove('hidden');
-    this.startPauseBtn.querySelector('.icon-pause').classList.add('hidden');
-    this.startPauseText.textContent = window.I18n ? window.I18n.get('btn_start') : 'Başlat';
+    if (this.mode === 'timer') {
+      this.updateDisplay(0);
+      this.updateControlsUI();
+    }
 
-    this.saveSessionBtn.disabled = false;
     this.startAlarm();
   }
 
@@ -554,60 +765,63 @@ class FlipStopwatchApp {
      CONTROLS: START / PAUSE / RESET / LAP
      ============================================================ */
   start() {
-    if (this.isRunning) return;
+    if (this.mode === 'clock') return;
+
+    this.audio.ensureAudioRunning();
 
     if (this.mode === 'timer') {
-      if (this.timerRemainingMs <= 0) {
+      if (this.timer.isRunning) return;
+
+      if (!this.timer.isStarted || this.timer.timerRemainingMs <= 0) {
         this.syncTimerFromInputs();
       }
-      if (this.timerRemainingMs <= 0) {
+      if (this.timer.timerRemainingMs <= 0) {
         return;
       }
+
+      this.timer.isStarted = true;
+      this.timer.isRunning = true;
+      this.timer.isFinished = false;
+      this.timer.startTime = performance.now();
 
       this.timerSetupPanel.classList.add('hidden');
       this.fliqloStage.classList.remove('hidden');
       this.fliqloControlsBar.classList.remove('hidden');
+
+      const totalSec = Math.floor(this.timer.timerRemainingMs / 1000);
+      const h = String(Math.floor(totalSec / 3600)).padStart(2, '0');
+      const m = String(Math.floor((totalSec % 3600) / 60)).padStart(2, '0');
+      const s = String(totalSec % 60).padStart(2, '0');
+      this.cards.setAllInstant(h, m, s);
+    } else if (this.mode === 'stopwatch') {
+      if (this.stopwatch.isRunning) return;
+
+      this.stopwatch.isRunning = true;
+      this.stopwatch.startTime = performance.now();
     }
 
-    this.audio.ensureAudioRunning();
-
-    this.isRunning = true;
-    this.startTime = performance.now();
-    this.lastTimerFrameTime = this.startTime;
-    this.timerId = requestAnimationFrame((t) => this.update(t));
-    if (document.hidden && this.worker) this.worker.postMessage('start');
-
-    this.startPauseBtn.classList.add('is-running');
-    this.startPauseBtn.querySelector('.icon-play').classList.add('hidden');
-    this.startPauseBtn.querySelector('.icon-pause').classList.remove('hidden');
-    this.startPauseText.textContent = window.I18n ? window.I18n.get('btn_pause') : 'Durdur';
-
-    this.resetBtn.disabled = false;
-    this.lapBtn.disabled = false;
-    this.saveSessionBtn.disabled = true;
+    this.ensureRunningLoop();
+    this.updateControlsUI();
   }
 
   pause() {
-    if (!this.isRunning) return;
-
-    this.isRunning = false;
-    cancelAnimationFrame(this.timerId);
-    if (this.worker) this.worker.postMessage('stop');
+    if (this.mode === 'clock') return;
 
     const now = performance.now();
-    if (this.mode === 'stopwatch') {
-      this.elapsedTime += now - this.startTime;
-    } else {
-      this.timerRemainingMs -= now - this.startTime;
-      if (this.timerRemainingMs < 0) this.timerRemainingMs = 0;
+
+    if (this.mode === 'timer') {
+      if (!this.timer.isRunning) return;
+      this.timer.isRunning = false;
+      this.timer.timerRemainingMs -= (now - this.timer.startTime);
+      if (this.timer.timerRemainingMs < 0) this.timer.timerRemainingMs = 0;
+    } else if (this.mode === 'stopwatch') {
+      if (!this.stopwatch.isRunning) return;
+      this.stopwatch.isRunning = false;
+      this.stopwatch.elapsedTime += (now - this.stopwatch.startTime);
     }
 
-    this.startPauseBtn.classList.remove('is-running');
-    this.startPauseBtn.querySelector('.icon-play').classList.remove('hidden');
-    this.startPauseBtn.querySelector('.icon-pause').classList.add('hidden');
-    this.startPauseText.textContent = window.I18n ? window.I18n.get('btn_resume') : 'Devam';
-
-    this.saveSessionBtn.disabled = false;
+    this.checkStopRunningLoop();
+    this.updateControlsUI();
   }
 
   toggleStartPause() {
@@ -619,66 +833,76 @@ class FlipStopwatchApp {
   }
 
   reset() {
-    this.pause();
+    if (this.mode === 'clock') return;
+
     this.stopAlarm();
 
-    this.startTime = 0;
-    this.elapsedTime = 0;
-    this.laps = [];
-    this.lastLapTime = 0;
-
-    this.startPauseBtn.classList.remove('is-running');
-    this.startPauseBtn.querySelector('.icon-play').classList.remove('hidden');
-    this.startPauseBtn.querySelector('.icon-pause').classList.add('hidden');
-    this.startPauseText.textContent = window.I18n ? window.I18n.get('btn_start') : 'Başlat';
-
-    this.resetBtn.disabled = true;
-    this.lapBtn.disabled = true;
-    this.saveSessionBtn.disabled = true;
-    this.lastTitleSec = -1;
-    document.title = 'AeroFlip Studio | Minimalist Flip Clock & Stopwatch';
-
-    this.renderActiveLaps();
-
     if (this.mode === 'timer') {
+      this.timer.isRunning = false;
+      this.timer.isStarted = false;
+      this.timer.isFinished = false;
+      this.timer.startTime = 0;
+      this.timer.laps = [];
+      this.timer.lastLapTime = 0;
+
       this.timerSetupPanel.classList.remove('hidden');
       this.fliqloStage.classList.add('hidden');
       this.fliqloControlsBar.classList.add('hidden');
+
       if (this.msLabel) this.msLabel.textContent = window.I18n ? window.I18n.get('pill_elapsed') : 'GEÇEN';
       if (this.msDisplay) this.msDisplay.textContent = '00:00:00';
       this.syncTimerFromInputs();
     } else if (this.mode === 'stopwatch') {
+      this.stopwatch.isRunning = false;
+      this.stopwatch.startTime = 0;
+      this.stopwatch.elapsedTime = 0;
+      this.stopwatch.laps = [];
+      this.stopwatch.lastLapTime = 0;
+
       this.cards.setAllInstant('00', '00', '00');
       if (this.msLabel) this.msLabel.textContent = window.I18n ? window.I18n.get('pill_ms') : 'MS';
       if (this.msDisplay) this.msDisplay.textContent = '.00';
     }
+
+    this.checkStopRunningLoop();
+    this.lastTitleSec = -1;
+    document.title = 'AeroFlip Studio | Minimalist Flip Clock & Stopwatch';
+    this.renderActiveLaps();
+    this.updateControlsUI();
   }
 
   addLap() {
-    if (!this.isRunning && this.elapsedTime === 0 && this.timerRemainingMs === this.timerDurationMs) return;
+    if (this.mode === 'clock') return;
 
     const now = performance.now();
 
     if (this.mode === 'stopwatch') {
-      const currentTotal = this.elapsedTime + (now - this.startTime);
-      const splitTime = currentTotal - this.lastLapTime;
-      this.lastLapTime = currentTotal;
+      if (!this.stopwatch.isRunning && this.stopwatch.elapsedTime === 0) return;
 
-      this.laps.unshift({
-        index: this.laps.length + 1,
+      const currentTotal = this.stopwatch.elapsedTime + (this.stopwatch.isRunning ? (now - this.stopwatch.startTime) : 0);
+      const splitTime = currentTotal - this.stopwatch.lastLapTime;
+      this.stopwatch.lastLapTime = currentTotal;
+
+      this.stopwatch.laps.unshift({
+        index: this.stopwatch.laps.length + 1,
         split: splitTime,
         total: currentTotal,
         mode: 'stopwatch'
       });
-    } else {
-      const currentElapsed = now - this.startTime;
-      const remaining = Math.max(0, this.timerRemainingMs - currentElapsed);
-      const elapsedFromTotal = this.timerDurationMs - remaining;
-      const splitTime = elapsedFromTotal - this.lastLapTime;
-      this.lastLapTime = elapsedFromTotal;
+    } else if (this.mode === 'timer') {
+      if (!this.timer.isStarted) return;
 
-      this.laps.unshift({
-        index: this.laps.length + 1,
+      let remaining = this.timer.timerRemainingMs;
+      if (this.timer.isRunning) {
+        const currentElapsed = now - this.timer.startTime;
+        remaining = Math.max(0, this.timer.timerRemainingMs - currentElapsed);
+      }
+      const elapsedFromTotal = Math.max(0, this.timer.timerDurationMs - remaining);
+      const splitTime = elapsedFromTotal - this.timer.lastLapTime;
+      this.timer.lastLapTime = elapsedFromTotal;
+
+      this.timer.laps.unshift({
+        index: this.timer.laps.length + 1,
         split: splitTime,
         remaining: remaining,
         elapsed: elapsedFromTotal,
@@ -690,15 +914,16 @@ class FlipStopwatchApp {
   }
 
   renderActiveLaps() {
-    if (this.laps.length === 0) {
+    const laps = this.laps;
+    if (!laps || laps.length === 0 || this.mode === 'clock') {
       this.lapsContainer.classList.remove('has-laps');
       return;
     }
 
     this.lapsContainer.classList.add('has-laps');
 
-    this.lapsList.innerHTML = this.laps.map(lap => {
-      if (this.mode === 'stopwatch') {
+    this.lapsList.innerHTML = laps.map(lap => {
+      if (lap.mode === 'stopwatch' || this.mode === 'stopwatch') {
         return `
           <div class="lap-item">
             <span>#${String(lap.index).padStart(2, '0')}</span>
@@ -869,15 +1094,16 @@ class FlipStopwatchApp {
 
     // Auto-manage Web Worker vs requestAnimationFrame on background tab switch
     document.addEventListener('visibilitychange', () => {
+      const anyRunning = this.stopwatch.isRunning || this.timer.isRunning;
       if (document.hidden) {
-        if (this.isRunning && this.worker) {
+        if (anyRunning && this.worker) {
           this.worker.postMessage('start');
         }
       } else {
         if (this.worker) {
           this.worker.postMessage('stop');
         }
-        if (this.isRunning && !this.timerId) {
+        if (anyRunning && !this.timerId) {
           this.lastTimerFrameTime = performance.now();
           this.timerId = requestAnimationFrame((t) => this.update(t));
         }
